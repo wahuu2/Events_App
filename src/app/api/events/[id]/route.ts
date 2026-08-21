@@ -91,6 +91,7 @@ export async function PATCH(
       );
     }
 
+    // Only organizers can update events
     if (currentUser.role !== "organizer") {
       return NextResponse.json(
         {
@@ -115,7 +116,11 @@ export async function PATCH(
       );
     }
 
-    if (event.organizer.toString() !== currentUser._id.toString()) {
+    // Organizer can only update their own events
+    if (
+      event.organizer.toString() !==
+      currentUser._id.toString()
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -139,11 +144,84 @@ export async function PATCH(
       "capacity",
     ];
 
+    // Update only allowed fields
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
         event[field] = body[field];
       }
     }
+
+    // Validate required text fields
+    if (
+      !event.title ||
+      !event.description ||
+      !event.image ||
+      !event.location ||
+      !event.date ||
+      !event.time ||
+      !event.category
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Please provide all required event fields.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Convert and validate price
+    const eventPrice = Number(event.price);
+
+    if (Number.isNaN(eventPrice)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Price must be a valid number.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (eventPrice < 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Price cannot be negative.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Convert and validate capacity
+    const eventCapacity = Number(event.capacity);
+
+    if (Number.isNaN(eventCapacity)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Capacity must be a valid number.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (
+      !Number.isInteger(eventCapacity) ||
+      eventCapacity < 1
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Capacity must be a whole number greater than 0.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Save validated values
+    event.price = eventPrice;
+    event.capacity = eventCapacity;
 
     await event.save();
 
