@@ -266,21 +266,30 @@ export default function BookingDetailsPage() {
         </div>
 
         {/* Actions */}
-        <div className="mt-8 flex flex-wrap gap-4">
-          <Link
-            href={`/events/${booking.event._id}`}
-            className="rounded-lg bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200"
-          >
-            View Event
-          </Link>
+<div className="mt-8 flex flex-wrap gap-4">
+  {booking.status === "pending" && booking.totalAmount > 0 && (
+    <Link
+      href={`/dashboard/bookings/${booking._id}/payment`}
+      className="rounded-lg bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
+    >
+      Pay Now
+    </Link>
+  )}
 
-          <Link
-            href="/dashboard/bookings"
-            className="rounded-lg border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-800"
-          >
-            All My Bookings
-          </Link>
-        </div>
+  <Link
+    href={`/events/${booking.event._id}`}
+    className="rounded-lg bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200"
+  >
+    View Event
+  </Link>
+
+  <Link
+    href="/dashboard/bookings"
+    className="rounded-lg border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-800"
+  >
+    All My Bookings
+  </Link>
+</div>
       </section>
     </main>
   );
