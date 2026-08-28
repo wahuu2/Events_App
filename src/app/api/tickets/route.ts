@@ -82,7 +82,6 @@ export async function POST(request: NextRequest) {
 
     // 2. Read request body
     const body = await request.json();
-
     const { bookingId } = body;
 
     // 3. Validate booking ID
@@ -127,7 +126,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: "You can only generate tickets for your own bookings.",
+          message:
+            "You can only generate tickets for your own bookings.",
         },
         { status: 403 }
       );
@@ -138,30 +138,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: "Tickets can only be generated for confirmed bookings.",
+          message:
+            "Tickets can only be generated for confirmed bookings.",
         },
         { status: 400 }
       );
     }
 
-    // 8. Check whether tickets already exist
+    // 8. Find existing tickets
     const existingTickets = await Ticket.find({
       booking: booking._id,
     });
 
-    if (existingTickets.length > 0) {
-  return NextResponse.json({
-    success: true,
-    alreadyExists: true,
-    message: "Tickets already exist for this booking.",
-    tickets: existingTickets,
-  });
-}
+    // 9. Check how many tickets are still needed
+    const ticketsNeeded =
+      booking.quantity - existingTickets.length;
 
-    // 9. Create one ticket per booked quantity
-    const tickets = [];
+    // 10. If all tickets already exist, return them
+    if (ticketsNeeded <= 0) {
+      return NextResponse.json({
+        success: true,
+        alreadyExists: true,
+        message: "All tickets already exist for this booking.",
+        tickets: existingTickets,
+      });
+    }
 
-    for (let i = 0; i < booking.quantity; i++) {
+    // 11. Create only the missing tickets
+    const newTickets = [];
+
+    for (let i = 0; i < ticketsNeeded; i++) {
       const ticket = await Ticket.create({
         booking: booking._id,
         user: booking.user,
@@ -170,16 +176,22 @@ export async function POST(request: NextRequest) {
         status: "valid",
       });
 
-      tickets.push(ticket);
+      newTickets.push(ticket);
     }
 
-    // 10. Return created tickets
+    // 12. Get all tickets for this booking
+    const allTickets = await Ticket.find({
+      booking: booking._id,
+    }).sort({ createdAt: 1 });
+
+    // 13. Return result
     return NextResponse.json(
   {
     success: true,
     alreadyExists: false,
-    message: "Tickets generated successfully.",
-    tickets,
+    generatedCount: newTickets.length,
+    message: `${newTickets.length} ticket(s) generated successfully.`,
+    tickets: allTickets,
   },
   { status: 201 }
 );
