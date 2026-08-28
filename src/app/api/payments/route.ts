@@ -5,11 +5,19 @@ import { connectToDatabase } from "@/database";
 import Booking from "@/database/booking.model";
 import Payment from "@/database/payment.model";
 import { getCurrentUser } from "@/lib/auth";
+import Ticket from "@/database/ticket.model";
 
 function generateTransactionReference() {
   return `PAY-${Date.now().toString(36).toUpperCase()}-${Math.random()
     .toString(36)
     .substring(2, 7)
+    .toUpperCase()}`;
+}
+
+function generateTicketNumber() {
+  return `TKT-${Date.now().toString(36).toUpperCase()}-${Math.random()
+    .toString(36)
+    .substring(2, 8)
     .toUpperCase()}`;
 }
 
@@ -347,36 +355,63 @@ export async function PATCH(request: NextRequest) {
       });
     }
 
-    // 13. Simulate successful payment
     payment.status = "successful";
 
-    await payment.save();
+await payment.save();
 
-    // 14. Confirm the booking
-    booking.status = "confirmed";
+// 14. Confirm the booking
+booking.status = "confirmed";
 
-    await booking.save();
+await booking.save();
 
-    // 15. Return successful result
-    return NextResponse.json({
-      success: true,
-      message: "Payment successful. Booking confirmed.",
-      payment: {
-        id: payment._id,
-        amount: payment.amount,
-        method: payment.method,
-        status: payment.status,
-        transactionReference:
-          payment.transactionReference,
-      },
-      booking: {
-        id: booking._id,
-        bookingReference: booking.bookingReference,
-        status: booking.status,
-        quantity: booking.quantity,
-        totalAmount: booking.totalAmount,
-      },
+// 15. Generate tickets for the confirmed booking
+const existingTickets = await Ticket.find({
+  booking: booking._id,
+});
+
+let tickets = existingTickets;
+
+if (existingTickets.length === 0) {
+  tickets = [];
+
+  for (let i = 0; i < booking.quantity; i++) {
+    const ticket = await Ticket.create({
+      booking: booking._id,
+      user: booking.user,
+      event: booking.event,
+      ticketNumber: generateTicketNumber(),
+      status: "valid",
     });
+
+    tickets.push(ticket);
+  }
+}
+
+    // 16. Return successful result
+    return NextResponse.json({
+  success: true,
+  message: "Payment successful. Booking confirmed and tickets generated.",
+  payment: {
+    id: payment._id,
+    amount: payment.amount,
+    method: payment.method,
+    status: payment.status,
+    transactionReference:
+      payment.transactionReference,
+  },
+  booking: {
+    id: booking._id,
+    bookingReference: booking.bookingReference,
+    status: booking.status,
+    quantity: booking.quantity,
+    totalAmount: booking.totalAmount,
+  },
+  tickets: tickets.map((ticket) => ({
+    id: ticket._id,
+    ticketNumber: ticket.ticketNumber,
+    status: ticket.status,
+  })),
+});
   } catch (error) {
     console.error("Process payment error:", error);
 

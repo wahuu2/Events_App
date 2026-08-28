@@ -25,15 +25,24 @@ type Booking = {
   event: Event;
 };
 
+type Ticket = {
+  _id: string;
+  ticketNumber: string;
+  status: string;
+};
+
 export default function BookingDetailsPage() {
   const params = useParams();
 
   const id = params.id as string;
 
-  const [booking, setBooking] = useState<Booking | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
+ const [booking, setBooking] = useState<Booking | null>(null);
+const [ticket, setTicket] = useState<Ticket | null>(null);
+const [loading, setLoading] = useState(true);
+const [ticketLoading, setTicketLoading] = useState(false);
+const [error, setError] = useState("");
+const [ticketError, setTicketError] = useState("");
+const [ticketExists, setTicketExists] = useState(false);
   useEffect(() => {
     async function fetchBooking() {
       try {
@@ -68,6 +77,50 @@ export default function BookingDetailsPage() {
       fetchBooking();
     }
   }, [id]);
+
+  async function generateTicket() {
+    if (!booking) return;
+
+    try {
+      setTicketLoading(true);
+      setTicketError("");
+
+      const response = await fetch("/api/tickets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookingId: booking._id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || "Failed to generate ticket"
+        );
+      }
+
+      if (!data.tickets || data.tickets.length === 0) {
+        throw new Error("No ticket was generated.");
+      }
+
+      setTicket(data.tickets[0]);
+setTicketExists(data.alreadyExists === true);
+    } catch (error) {
+      console.error("Generate ticket error:", error);
+
+      setTicketError(
+        error instanceof Error
+          ? error.message
+          : "Failed to generate ticket."
+      );
+    } finally {
+      setTicketLoading(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -163,17 +216,11 @@ export default function BookingDetailsPage() {
             </h1>
 
             <div className="mt-6 space-y-3 text-gray-300">
-              <p>
-                📍 {booking.event.location}
-              </p>
+              <p>📍 {booking.event.location}</p>
 
-              <p>
-                📅 {formattedDate}
-              </p>
+              <p>📅 {formattedDate}</p>
 
-              <p>
-                ⏰ {booking.event.time}
-              </p>
+              <p>⏰ {booking.event.time}</p>
             </div>
           </div>
         </div>
@@ -265,31 +312,88 @@ export default function BookingDetailsPage() {
           </div>
         </div>
 
+        {/* Ticket generation */}
+        {booking.status === "confirmed" && (
+          <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
+            <h2 className="text-xl font-semibold">
+              Digital Ticket
+            </h2>
+
+            <p className="mt-2 text-gray-400">
+              Your booking is confirmed. Generate your digital
+              ticket to attend the event.
+            </p>
+
+            {ticketError && (
+              <div className="mt-4 rounded-lg border border-red-800 bg-red-950 p-4 text-sm text-red-300">
+                {ticketError}
+              </div>
+            )}
+
+            {!ticket ? (
+              <button
+                onClick={generateTicket}
+                disabled={ticketLoading}
+                className="mt-6 rounded-lg bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {ticketLoading
+                  ? "Generating Ticket..."
+                  : "Generate Ticket"}
+              </button>
+            ) : (
+              <div className="mt-6 rounded-xl border border-green-800 bg-green-950 p-5">
+                <p className="text-sm text-green-400">
+  ✓{" "}
+  {ticketExists
+    ? "You already have a ticket for this booking."
+    : "Ticket generated successfully."}
+</p>
+
+                <p className="mt-3 text-sm text-gray-400">
+                  Ticket Number
+                </p>
+
+                <p className="mt-1 font-mono text-lg font-bold">
+                  {ticket.ticketNumber}
+                </p>
+
+                <p className="mt-3 text-sm">
+                  Status:{" "}
+                  <span className="font-semibold capitalize text-green-400">
+                    {ticket.status}
+                  </span>
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Actions */}
-<div className="mt-8 flex flex-wrap gap-4">
-  {booking.status === "pending" && booking.totalAmount > 0 && (
-    <Link
-      href={`/dashboard/bookings/${booking._id}/payment`}
-      className="rounded-lg bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
-    >
-      Pay Now
-    </Link>
-  )}
+        <div className="mt-8 flex flex-wrap gap-4">
+          {booking.status === "pending" &&
+            booking.totalAmount > 0 && (
+              <Link
+                href={`/dashboard/bookings/${booking._id}/payment`}
+                className="rounded-lg bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
+              >
+                Pay Now
+              </Link>
+            )}
 
-  <Link
-    href={`/events/${booking.event._id}`}
-    className="rounded-lg bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200"
-  >
-    View Event
-  </Link>
+          <Link
+            href={`/events/${booking.event._id}`}
+            className="rounded-lg bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200"
+          >
+            View Event
+          </Link>
 
-  <Link
-    href="/dashboard/bookings"
-    className="rounded-lg border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-800"
-  >
-    All My Bookings
-  </Link>
-</div>
+          <Link
+            href="/dashboard/bookings"
+            className="rounded-lg border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-800"
+          >
+            All My Bookings
+          </Link>
+        </div>
       </section>
     </main>
   );
