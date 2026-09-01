@@ -20,7 +20,7 @@ export default function OrganizerEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  
   async function fetchEvents() {
     try {
       setLoading(true);
@@ -245,11 +245,11 @@ export default function OrganizerEventsPage() {
 
                   <div className="mt-5 grid grid-cols-3 gap-2">
                     <Link
-                      href={`/events/${event._id}`}
-                      className="rounded-lg border border-gray-700 px-3 py-2 text-center text-sm hover:bg-gray-800"
-                    >
-                      View
-                    </Link>
+  href={`/dashboard/events/${event._id}`}
+  className="rounded-lg border border-gray-700 px-3 py-2 text-center text-sm hover:bg-gray-800"
+>
+  Analytics
+</Link>
 
                     <Link
                       href={`/dashboard/events/${event._id}/edit`}
