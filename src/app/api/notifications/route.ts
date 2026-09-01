@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-
 import { connectToDatabase } from "@/database";
 import Notification from "@/database/notification.model";
 import { getCurrentUser } from "@/lib/auth";
+import { getIO } from "@/lib/socket";
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,10 +11,7 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "You must be signed in.",
-        },
+        { success: false, message: "You must be signed in." },
         { status: 401 }
       );
     }
@@ -23,38 +20,30 @@ export async function GET(request: NextRequest) {
     await connectToDatabase();
 
     // 3. Get user's notifications
-    const notifications = await Notification.find({
-      user: user._id,
-    })
+    const notifications = await Notification.find({ user: user._id })
       .sort({ createdAt: -1 })
       .lean();
 
     // 4. Count unread notifications
-    const unreadCount = notifications.filter(
-      (notification) => !notification.read
-    ).length;
+    const unreadCount = notifications.filter((n) => !n.read).length;
 
     // 5. Return notifications
     return NextResponse.json({
       success: true,
-      notifications: notifications.map((notification) => ({
-        id: notification._id.toString(),
-        type: notification.type,
-        title: notification.title,
-        message: notification.message,
-        read: notification.read,
-        createdAt: notification.createdAt,
+      notifications: notifications.map((n) => ({
+        id: n._id.toString(),
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        read: n.read,
+        createdAt: n.createdAt,
       })),
       unreadCount,
     });
   } catch (error) {
     console.error("Get notifications error:", error);
-
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch notifications.",
-      },
+      { success: false, message: "Failed to fetch notifications." },
       { status: 500 }
     );
   }
@@ -73,7 +62,6 @@ export async function POST(request: NextRequest) {
 
     await connectToDatabase();
     const body = await request.json();
-
     const { type, title, message } = body;
 
     if (!type || !title || !message) {
@@ -83,6 +71,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 1. Create notification
     const notification = await Notification.create({
       user: user._id,
       type,
@@ -90,6 +79,22 @@ export async function POST(request: NextRequest) {
       message,
     });
 
+    // 2. Emit real-time event via Socket.IO
+    try {
+      const io = getIO();
+      io.to(user._id.toString()).emit("notification:new", {
+        id: notification._id.toString(),
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        read: notification.read,
+        createdAt: notification.createdAt,
+      });
+    } catch (emitError) {
+      console.error("Socket emit error:", emitError);
+    }
+
+    // 3. Return response
     return NextResponse.json({
       success: true,
       notification: {
@@ -103,7 +108,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Create notification error:", error);
-
     return NextResponse.json(
       { success: false, message: "Failed to create notification." },
       { status: 500 }
