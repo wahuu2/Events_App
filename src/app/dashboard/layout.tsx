@@ -60,36 +60,61 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               {/* Dropdown */}
               {open && (
                 <div className="absolute right-0 mt-2 w-80 bg-gray-900 shadow-lg rounded-lg border border-gray-800 p-2">
-                  <h3 className="font-semibold mb-2 text-white">Notifications</h3>
-                  <ul className="max-h-60 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <li className="text-gray-500 text-sm">No notifications</li>
-                    ) : (
-                      notifications.map((n) => (
-                        <li
-  key={n.id}
-  onClick={() => markAsRead(n.id)}
-  className={`cursor-pointer p-2 border-b border-gray-800 text-sm hover:bg-gray-800 transition ${
-    n.read ? "text-gray-500" : "font-medium text-gray-100"
-  }`}
->
-  <div className="flex items-center gap-2">
-    {n.type === "success" && <span className="text-green-400 font-bold text-lg">✔</span>}
-    {n.type === "warning" && <span className="text-yellow-400 font-bold text-lg">⚠</span>}
-    {n.type === "error" && <span className="text-red-400 font-bold text-lg">✖</span>}
-    {n.type === "info" && <span className="text-blue-400 font-bold text-lg">ℹ</span>}
-  <div>
-      <p>{n.title}</p>
-      <p className="text-xs text-gray-400">{n.message}</p>
-    </div>
-  </div>
-</li>
+  <h3 className="font-semibold mb-2 text-white">Notifications</h3>
+  <ul className="max-h-60 overflow-y-auto">
+    {notifications.length === 0 ? (
+      <li className="text-gray-500 text-sm">No notifications</li>
+    ) : (
+      notifications.map((n) => (
+        <li
+          key={n.id}
+          onClick={() => markAsRead(n.id)}
+          className={`cursor-pointer p-2 border-b border-gray-800 text-sm hover:bg-gray-800 transition ${
+            n.read ? "text-gray-500" : "font-medium text-gray-100"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {n.type === "success" && (
+              <span className="text-green-400 font-bold text-lg">✔</span>
+            )}
+            {n.type === "warning" && (
+              <span className="text-yellow-400 font-bold text-lg">⚠</span>
+            )}
+            {n.type === "error" && (
+              <span className="text-red-400 font-bold text-lg">✖</span>
+            )}
+            {n.type === "info" && (
+              <span className="text-blue-400 font-bold text-lg">ℹ</span>
+            )}
+            <div>
+              <p>{n.title}</p>
+              <p className="text-xs text-gray-400">{n.message}</p>
+            </div>
+          </div>
+        </li>
+      ))
+    )}
+  </ul>
 
+  {/* Cleanup Button */}
+  <button
+    onClick={async () => {
+      await fetch("/api/notifications/cleanup", { method: "DELETE" });
+      // Re-fetch notifications after cleanup
+      const res = await fetch("/api/notifications");
+      const data = await res.json();
+      if (data.success) {
+        // update state manually if needed
+        // e.g. setNotifications(data.notifications);
+        // setUnreadCount(data.unreadCount);
+      }
+    }}
+    className="text-xs text-red-400 hover:text-red-600 mt-2"
+  >
+    Clear old notifications
+  </button>
+</div>
 
-                      ))
-                    )}
-                  </ul>
-                </div>
               )}
             </div>
           </div>
