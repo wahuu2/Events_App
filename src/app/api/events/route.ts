@@ -10,8 +10,12 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
 
-    const search = searchParams.get("search");
-    const category = searchParams.get("category");
+    const search = searchParams.get("search")?.trim();
+    const category = searchParams.get("category")?.trim();
+    const location = searchParams.get("location")?.trim();
+    const dateFilter = searchParams.get("date")?.trim().toLowerCase();
+    const priceFilter = searchParams.get("price")?.trim().toLowerCase();
+    const sort = searchParams.get("sort")?.trim().toLowerCase();
 
     const filter: Record<string, unknown> = {};
 
@@ -25,19 +29,125 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter by category
-    if (category && category !== "all") {
+    if (category && category.toLowerCase() !== "all") {
       filter.category = {
         $regex: `^${category}$`,
         $options: "i",
       };
     }
 
-    const events = await Event.find(filter)
-      .populate(
-        "organizer",
-        "firstName lastName email imageUrl"
-      )
-      .sort({ date: 1 });
+    // Filter by location
+    if (location && location.toLowerCase() !== "all") {
+      filter.location = {
+        $regex: location,
+        $options: "i",
+      };
+    }
+
+    // Filter by date
+    if (dateFilter === "today") {
+      const now = new Date();
+
+      const startOfDay = new Date(now);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(now);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      filter.date = {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      };
+    }
+
+    if (dateFilter === "week") {
+      const now = new Date();
+
+      const startOfWeek = new Date(now);
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      const day = startOfWeek.getDay();
+      const difference = day === 0 ? 6 : day - 1;
+
+      startOfWeek.setDate(startOfWeek.getDate() - difference);
+
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      endOfWeek.setHours(23, 59, 59, 999);
+
+      filter.date = {
+        $gte: startOfWeek,
+        $lte: endOfWeek,
+      };
+    }
+
+    if (dateFilter === "month") {
+      const now = new Date();
+
+      const startOfMonth = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1
+      );
+
+      const endOfMonth = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+      );
+
+      filter.date = {
+        $gte: startOfMonth,
+        $lte: endOfMonth,
+      };
+    }
+
+    // Filter by price
+    if (priceFilter === "free") {
+      filter.price = 0;
+    }
+
+    if (priceFilter === "paid") {
+      filter.price = {
+        $gt: 0,
+      };
+    }
+
+    // Sorting
+let sortOption: Record<string, 1 | -1> = {
+  date: 1,
+};
+
+if (sort === "latest") {
+  sortOption = {
+    date: -1,
+  };
+}
+
+if (sort === "price-low") {
+  sortOption = {
+    price: 1,
+  };
+}
+
+if (sort === "price-high") {
+  sortOption = {
+    price: -1,
+  };
+}
+
+const events = await Event.find(filter)
+  .populate(
+    "organizer",
+    "firstName lastName email imageUrl"
+  )
+  .sort(sortOption)
+  .limit(100)
+  .lean();
 
     return NextResponse.json({
       success: true,
@@ -58,7 +168,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get the currently logged-in MongoDB user
     const user = await getCurrentUser();
 
     if (!user) {
@@ -170,7 +279,6 @@ export async function POST(request: NextRequest) {
       organizer: user._id,
     });
 
-    // Return the newly created event
     return NextResponse.json(
       {
         success: true,

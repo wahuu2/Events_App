@@ -1,6 +1,6 @@
-import mongoose, { Schema, models } from "mongoose";
+import mongoose, { Schema, model, models } from "mongoose";
 
-const eventSchema = new Schema(
+const EventSchema = new Schema(
   {
     title: {
       type: String,
@@ -64,6 +64,13 @@ const eventSchema = new Schema(
   }
 );
 
-const Event = models.Event || mongoose.model("Event", eventSchema);
+// Indexes for faster filtering and sorting
+EventSchema.index({ date: 1 });
+EventSchema.index({ category: 1 });
+EventSchema.index({ location: 1 });
+EventSchema.index({ price: 1 });
+
+const Event =
+  models.Event || model("Event", EventSchema);
 
 export default Event;
