@@ -1,39 +1,60 @@
-import { BellIcon } from "@heroicons/react/24/outline";
-import { useNotifications } from "@/hooks/useNotifications";
+"use client";
 
-export default function DashboardLayout({ children }) {
+import { ReactNode, useState } from "react";
+import { useNotifications } from "@/hooks/useNotifications";
+import { BellIcon } from "@heroicons/react/24/outline";
+
+export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { notifications, unreadCount } = useNotifications();
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="flex justify-between items-center p-4 border-b">
+      {/* Header */}
+      <header className="flex justify-between items-center p-4 border-b bg-white">
         <h1 className="text-xl font-bold">EventApp Dashboard</h1>
+
         <div className="flex items-center gap-4">
           {/* Notification Bell */}
-          <button className="relative">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-gray-700"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-              />
-            </svg>
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
-                {unreadCount}
-              </span>
+          <div className="relative">
+            <button onClick={() => setOpen(!open)} className="relative">
+              <BellIcon className="h-6 w-6 text-gray-700" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Dropdown */}
+            {open && (
+              <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-lg border p-2">
+                <h3 className="font-semibold mb-2">Notifications</h3>
+                <ul className="max-h-60 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <li className="text-gray-500 text-sm">No notifications</li>
+                  ) : (
+                    notifications.map((n) => (
+                      <li
+                        key={n.id}
+                        className={`p-2 border-b text-sm ${
+                          n.read ? "text-gray-500" : "font-medium"
+                        }`}
+                      >
+                        <p>{n.title}</p>
+                        <p className="text-xs text-gray-600">{n.message}</p>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
             )}
-          </button>
+          </div>
         </div>
       </header>
-      <main className="flex-1">{children}</main>
+
+      {/* Main content */}
+      <main className="flex-1 p-4">{children}</main>
     </div>
   );
 }
