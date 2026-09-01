@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/auth";
 import Event from "@/database/event.model";
 import Booking from "@/database/booking.model";
 import Ticket from "@/database/ticket.model";
+import { createNotification } from "@/lib/notifications";
 
 type RouteContext = {
   params: Promise<{
@@ -21,7 +22,6 @@ export async function GET(
   try {
     const { id } = await context.params;
 
-    // Validate event ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
@@ -32,7 +32,6 @@ export async function GET(
       );
     }
 
-    // Get logged-in user
     const user = await getCurrentUser();
 
     if (!user) {
@@ -45,7 +44,6 @@ export async function GET(
       );
     }
 
-    // Only organizers can access event analytics
     if (user.role !== "organizer") {
       return NextResponse.json(
         {
@@ -58,7 +56,6 @@ export async function GET(
 
     await connectToDatabase();
 
-    // Find the event
     const event = await Event.findById(id)
       .populate(
         "organizer",
@@ -76,7 +73,6 @@ export async function GET(
       );
     }
 
-    // Make sure this organizer owns the event
     const eventOrganizerId =
       typeof event.organizer === "object" &&
       event.organizer !== null &&
@@ -94,31 +90,26 @@ export async function GET(
       );
     }
 
-    // Find confirmed bookings for this event
     const bookings = await Booking.find({
       event: event._id,
       status: "confirmed",
     }).lean();
 
-    // Calculate ticket sales
     const ticketsSold = bookings.reduce(
       (total, booking) => total + booking.quantity,
       0
     );
 
-    // Calculate revenue
     const totalRevenue = bookings.reduce(
       (total, booking) => total + booking.totalAmount,
       0
     );
 
-    // Calculate remaining tickets
     const ticketsRemaining = Math.max(
       event.capacity - ticketsSold,
       0
     );
 
-    // Find all tickets for this event
     const tickets = await Ticket.find({
       event: event._id,
     })
@@ -133,17 +124,14 @@ export async function GET(
       .sort({ createdAt: -1 })
       .lean();
 
-    // Count checked-in tickets
     const checkedInTickets = tickets.filter(
       (ticket) => ticket.status === "used"
     ).length;
 
-    // Count valid tickets
     const validTickets = tickets.filter(
       (ticket) => ticket.status === "valid"
     ).length;
 
-    // Count cancelled tickets
     const cancelledTickets = tickets.filter(
       (ticket) => ticket.status === "cancelled"
     ).length;
@@ -196,6 +184,80 @@ export async function GET(
       {
         success: false,
         message: "Failed to fetch event analytics",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid event ID",
+        },
+        { status: 400 }
+      );
+    }
+
+    const user = await getCurrentUser();
+
+    if (!user || user.role !== "organizer") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Unauthorized",
+        },
+        { status: 401 }
+      );
+    }
+
+    await connectToDatabase();
+
+    const body = await req.json();
+
+    const event = await Event.findByIdAndUpdate(
+      id,
+      body,
+      { new: true }
+    );
+
+    if (!event) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Event not found",
+        },
+        { status: 404 }
+      );
+    }
+
+    await createNotification({
+      userId: user._id.toString(),
+      type: "event_updated",
+      title: "Event Updated",
+      message: `Organizer updated event "${event.title}".`,
+      preferenceKey: "eventUpdated",
+    });
+
+    return NextResponse.json({
+      success: true,
+      event,
+    });
+  } catch (error) {
+    console.error("Event update error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to update event",
       },
       { status: 500 }
     );

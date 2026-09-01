@@ -137,32 +137,11 @@ export default function TicketPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="flex items-center justify-between border-b border-gray-800 px-8 py-5 print:hidden">
-        <Link
-          href="/"
-          className="text-xl font-bold"
-        >
-          EventApp
-        </Link>
-
-        <Link
-          href="/dashboard/bookings"
-          className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800"
-        >
-          My Bookings
-        </Link>
-      </nav>
-
+      
       <section className="mx-auto max-w-5xl px-6 py-12">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between print:hidden">
           <div>
-            <Link
-              href={`/dashboard/bookings/${id}`}
-              className="text-sm text-gray-400 hover:text-white"
-            >
-              ← Back to Booking
-            </Link>
-
+          
             <h1 className="mt-4 text-3xl font-bold">
               Your Digital Tickets
             </h1>

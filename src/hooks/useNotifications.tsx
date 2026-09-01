@@ -1,42 +1,43 @@
 "use client";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
-  useEffect(() => {
-    async function fetchData() {
+  async function fetchData() {
+    try {
+      setLoading(true);
+      setError("");
+
       const res = await fetch("/api/notifications");
       const data = await res.json();
-      if (data.success) {
-        setNotifications(data.notifications);
-        setUnreadCount(data.unreadCount);
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to fetch notifications");
       }
-    }
-    fetchData();
 
-    const socket = io();
-
-    // When a new notification arrives
-    socket.on("notification:new", (notification) => {
-      setNotifications((prev) => [notification, ...prev]);
-      setUnreadCount((prev) => prev + 1); // increment badge instantly
-    });
-
-    // When a notification is marked as read
-    socket.on("notification:read", (id) => {
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      setNotifications(data.notifications || []);
+      setUnreadCount(data.unreadCount || 0);
+    } catch (err) {
+      console.error("Failed to fetch notifications:", err);
+      setError(
+        err instanceof Error ? err.message : "Unexpected error fetching notifications"
       );
-      setUnreadCount((prev) => Math.max(prev - 1, 0)); // decrement badge instantly
-    });
+      setNotifications([]); // clear to avoid stale data
+      setUnreadCount(0);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-    return () => {
-      socket.disconnect();
-    };
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 10000); // poll every 10s
+    return () => clearInterval(interval);
   }, []);
 
-  return { notifications, unreadCount };
+  return { notifications, unreadCount, loading, error, refetch: fetchData };
 }

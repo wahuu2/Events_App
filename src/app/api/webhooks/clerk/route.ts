@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { connectToDatabase } from "@/database";
 import User from "@/database/user.model";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(request: Request) {
   try {
@@ -10,6 +11,7 @@ export async function POST(request: Request) {
 
     await connectToDatabase();
 
+    // USER CREATED
     if (event.type === "user.created") {
       const {
         id,
@@ -24,7 +26,13 @@ export async function POST(request: Request) {
         (email) => email.id === primary_email_address_id
       );
 
-      await User.findOneAndUpdate(
+      // Check whether this user already exists
+      const existingUser = await User.findOne({
+        clerkId: id,
+      });
+
+      // Create the user only if they don't already exist
+      const user = await User.findOneAndUpdate(
         { clerkId: id },
         {
           clerkId: id,
@@ -36,12 +44,27 @@ export async function POST(request: Request) {
         {
           upsert: true,
           new: true,
+          setDefaultsOnInsert: true,
         }
       );
 
       console.log("User created in MongoDB:", id);
+
+      // Create welcome notification only for a genuinely new user
+      if (!existingUser && user) {
+        await createNotification({
+          userId: user._id.toString(),
+          type: "registration_confirmed",
+          title: "Welcome to EventApp",
+          message:
+            "Your EventApp account has been created successfully.",
+        });
+
+        console.log("Registration notification created:", id);
+      }
     }
 
+    // USER UPDATED
     if (event.type === "user.updated") {
       const {
         id,
@@ -72,6 +95,7 @@ export async function POST(request: Request) {
       console.log("User updated in MongoDB:", id);
     }
 
+    // USER DELETED
     if (event.type === "user.deleted") {
       await User.findOneAndDelete({
         clerkId: event.data.id,

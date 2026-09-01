@@ -28,6 +28,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/dev/types/**/*.ts"
-  ],
+, "server.ts"  ],
   "exclude": ["node_modules"]
 }

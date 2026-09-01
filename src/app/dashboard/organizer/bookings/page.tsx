@@ -70,32 +70,7 @@ export default function OrganizerBookingsPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between border-b border-gray-800 px-8 py-5">
-        <Link
-          href="/"
-          className="text-xl font-bold"
-        >
-          EventApp
-        </Link>
-
-        <div className="flex gap-3">
-          <Link
-            href="/events"
-            className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800"
-          >
-            Browse Events
-          </Link>
-
-          <Link
-            href="/dashboard/organizer"
-            className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800"
-          >
-            Dashboard
-          </Link>
-        </div>
-      </nav>
-
+     
       {/* Main content */}
       <section className="mx-auto max-w-7xl px-6 py-12">
         {/* Header */}
@@ -114,13 +89,6 @@ export default function OrganizerBookingsPage() {
                 View bookings made for your events.
               </p>
             </div>
-
-            <Link
-              href="/dashboard/organizer"
-              className="rounded-lg border border-gray-700 px-5 py-3 text-center hover:bg-gray-800"
-            >
-              ← Back to Dashboard
-            </Link>
           </div>
         </div>
 

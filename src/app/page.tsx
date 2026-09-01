@@ -51,6 +51,13 @@ export default function HomePage() {
           </Link>
 
           <Link
+            href="/dashboard"
+            className="rounded-lg bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200"
+          >
+            Dashboard
+          </Link>
+
+          <Link
             href="/sign-up"
             className="rounded-lg border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-800"
           >

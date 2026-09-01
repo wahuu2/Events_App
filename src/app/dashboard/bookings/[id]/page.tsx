@@ -172,32 +172,10 @@ setTicketExists(data.alreadyExists === true);
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between border-b border-gray-800 px-8 py-5">
-        <Link
-          href="/"
-          className="text-xl font-bold"
-        >
-          EventApp
-        </Link>
-
-        <Link
-          href="/dashboard/bookings"
-          className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800"
-        >
-          My Bookings
-        </Link>
-      </nav>
+      
 
       <section className="mx-auto max-w-5xl px-6 py-12">
-        {/* Back */}
-        <Link
-          href="/dashboard/bookings"
-          className="text-sm text-gray-400 hover:text-white"
-        >
-          ← Back to My Bookings
-        </Link>
-
+       
         {/* Booking header */}
         <div className="mt-8 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">
           <img

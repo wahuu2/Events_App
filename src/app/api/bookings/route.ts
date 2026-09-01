@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { connectToDatabase } from "@/database";
 import Event from "@/database/event.model";
 import Booking from "@/database/booking.model";
-import Notification from "@/database/notification.model";
+import { createNotification } from "@/lib/notifications";
 
 function generateBookingReference() {
   return `EVT-${Date.now().toString(36).toUpperCase()}-${Math.random()
@@ -43,7 +43,10 @@ export async function POST(request: NextRequest) {
       quantity < 1
     ) {
       return NextResponse.json(
-        { success: false, message: "Quantity must be a whole number greater than 0." },
+        {
+          success: false,
+          message: "Quantity must be a whole number greater than 0.",
+        },
         { status: 400 }
       );
     }
@@ -51,6 +54,7 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
 
     const event = await Event.findById(eventId);
+
     if (!event) {
       return NextResponse.json(
         { success: false, message: "Event not found." },
@@ -74,7 +78,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: `Only ${ticketsRemaining} ticket${ticketsRemaining === 1 ? "" : "s"} remaining.`,
+          message: `Only ${ticketsRemaining} ticket${
+            ticketsRemaining === 1 ? "" : "s"
+          } remaining.`,
         },
         { status: 400 }
       );
@@ -91,16 +97,15 @@ export async function POST(request: NextRequest) {
       bookingReference: generateBookingReference(),
     });
 
-    // 🔔 Create notification for booking
-    await Notification.create({
-      user: user._id,
-      type: event.price === 0 ? "booking_confirmed" : "booking_confirmed",
-      title: event.price === 0 ? "Booking Confirmed" : "Booking Created",
-      message:
-        event.price === 0
-          ? `Your booking for "${event.title}" (${quantity} ticket${quantity > 1 ? "s" : ""}) has been confirmed.`
-          : `Your booking for "${event.title}" (${quantity} ticket${quantity > 1 ? "s" : ""}) has been created. Please complete payment.`,
-    });
+    if (event.price === 0) {
+      await createNotification({
+        userId: user._id.toString(),
+        type: "booking_confirmed",
+        title: "Booking Confirmed",
+        message: `Your booking for ${event.title} has been confirmed successfully.`,
+        preferenceKey: "bookingConfirmed",
+      });
+    }
 
     return NextResponse.json(
       {

@@ -11,19 +11,13 @@ const notificationSchema = new Schema(
     type: {
       type: String,
       enum: [
-        // Event-specific types
+        "registration_confirmed",
         "booking_confirmed",
         "payment_successful",
         "ticket_generated",
         "event_updated",
         "event_cancelled",
         "event_reminder",
-
-        // Generic styling types
-        "success",
-        "warning",
-        "info",
-        "error",
       ],
       required: true,
     },

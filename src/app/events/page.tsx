@@ -66,6 +66,12 @@ useEffect(() => {
 
         <div className="flex gap-4">
           <Link
+                      href="/dashboard"
+                      className="rounded-lg bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
             href="/sign-in"
             className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800"
           >
@@ -78,6 +84,7 @@ useEffect(() => {
           >
             Sign Up
           </Link>
+          
         </div>
       </nav>
 
