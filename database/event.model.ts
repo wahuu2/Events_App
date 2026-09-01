@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models } from "mongoose";
+import mongoose, { Schema, models } from "mongoose";
 
 const EventSchema = new Schema(
   {
@@ -64,13 +64,14 @@ const EventSchema = new Schema(
   }
 );
 
-// Indexes for faster filtering and sorting
+// Indexes for search, filtering and sorting
 EventSchema.index({ date: 1 });
 EventSchema.index({ category: 1 });
 EventSchema.index({ location: 1 });
 EventSchema.index({ price: 1 });
 
+// Reuse the existing model during Next.js hot reloads
 const Event =
-  models.Event || model("Event", EventSchema);
+  models.Event || mongoose.model("Event", EventSchema);
 
 export default Event;
