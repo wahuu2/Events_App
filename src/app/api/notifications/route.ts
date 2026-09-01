@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
         message: n.message,
         read: n.read,
         createdAt: n.createdAt,
+         updatedAt: n.updatedAt, 
       })),
       unreadCount,
     });
@@ -93,6 +94,25 @@ export async function POST(request: NextRequest) {
     } catch (emitError) {
       console.error("Socket emit error:", emitError);
     }
+const validTypes = [
+  "booking_confirmed",
+  "payment_successful",
+  "ticket_generated",
+  "event_updated",
+  "event_cancelled",
+  "event_reminder",
+  "success",
+  "warning",
+  "info",
+  "error",
+];
+
+if (!validTypes.includes(type)) {
+  return NextResponse.json(
+    { success: false, message: "Invalid notification type." },
+    { status: 400 }
+  );
+}
 
     // 3. Return response
     return NextResponse.json({

@@ -73,9 +73,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     n.read ? "text-gray-500" : "font-medium text-gray-100"
   }`}
 >
-  <p>{n.title}</p>
-  <p className="text-xs text-gray-400">{n.message}</p>
+  <div className="flex items-center gap-2">
+    {n.type === "success" && <span className="text-green-400">✔</span>}
+    {n.type === "warning" && <span className="text-yellow-400">⚠</span>}
+    {n.type === "error" && <span className="text-red-400">✖</span>}
+    {n.type === "info" && <span className="text-blue-400">ℹ</span>}
+    <div>
+      <p>{n.title}</p>
+      <p className="text-xs text-gray-400">{n.message}</p>
+    </div>
+  </div>
 </li>
+
 
                       ))
                     )}
