@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { connectToDatabase } from "@/database";
 import Event from "@/database/event.model";
 import Booking from "@/database/booking.model";
+import Notification from "@/database/notification.model";
 
 function generateBookingReference() {
   return `EVT-${Date.now().toString(36).toUpperCase()}-${Math.random()
@@ -26,15 +27,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-
     const { eventId, quantity } = body;
 
     if (!eventId) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Event ID is required.",
-        },
+        { success: false, message: "Event ID is required." },
         { status: 400 }
       );
     }
@@ -46,10 +43,7 @@ export async function POST(request: NextRequest) {
       quantity < 1
     ) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Quantity must be a whole number greater than 0.",
-        },
+        { success: false, message: "Quantity must be a whole number greater than 0." },
         { status: 400 }
       );
     }
@@ -57,13 +51,9 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
 
     const event = await Event.findById(eventId);
-
     if (!event) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Event not found.",
-        },
+        { success: false, message: "Event not found." },
         { status: 404 }
       );
     }
@@ -84,9 +74,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: `Only ${ticketsRemaining} ticket${
-            ticketsRemaining === 1 ? "" : "s"
-          } remaining.`,
+          message: `Only ${ticketsRemaining} ticket${ticketsRemaining === 1 ? "" : "s"} remaining.`,
         },
         { status: 400 }
       );
@@ -101,6 +89,17 @@ export async function POST(request: NextRequest) {
       totalAmount,
       status: event.price === 0 ? "confirmed" : "pending",
       bookingReference: generateBookingReference(),
+    });
+
+    // 🔔 Create notification for booking
+    await Notification.create({
+      user: user._id,
+      type: event.price === 0 ? "booking_confirmed" : "booking_confirmed",
+      title: event.price === 0 ? "Booking Confirmed" : "Booking Created",
+      message:
+        event.price === 0
+          ? `Your booking for "${event.title}" (${quantity} ticket${quantity > 1 ? "s" : ""}) has been confirmed.`
+          : `Your booking for "${event.title}" (${quantity} ticket${quantity > 1 ? "s" : ""}) has been created. Please complete payment.`,
     });
 
     return NextResponse.json(
@@ -131,10 +130,7 @@ export async function POST(request: NextRequest) {
     console.error("Create booking error:", error);
 
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to create booking.",
-      },
+      { success: false, message: "Failed to create booking." },
       { status: 500 }
     );
   }
@@ -146,38 +142,24 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "You must be signed in",
-        },
+        { success: false, message: "You must be signed in" },
         { status: 401 }
       );
     }
 
     await connectToDatabase();
 
-    const bookings = await Booking.find({
-      user: user._id,
-    })
-      .populate(
-        "event",
-        "title image location date time category price"
-      )
+    const bookings = await Booking.find({ user: user._id })
+      .populate("event", "title image location date time category price")
       .sort({ createdAt: -1 })
       .lean();
 
-    return NextResponse.json({
-      success: true,
-      bookings,
-    });
+    return NextResponse.json({ success: true, bookings });
   } catch (error) {
     console.error("Get bookings error:", error);
 
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch bookings",
-      },
+      { success: false, message: "Failed to fetch bookings" },
       { status: 500 }
     );
   }
