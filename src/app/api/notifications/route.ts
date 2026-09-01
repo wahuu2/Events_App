@@ -59,3 +59,54 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "You must be signed in." },
+        { status: 401 }
+      );
+    }
+
+    await connectToDatabase();
+    const body = await request.json();
+
+    const { type, title, message } = body;
+
+    if (!type || !title || !message) {
+      return NextResponse.json(
+        { success: false, message: "Missing required fields." },
+        { status: 400 }
+      );
+    }
+
+    const notification = await Notification.create({
+      user: user._id,
+      type,
+      title,
+      message,
+    });
+
+    return NextResponse.json({
+      success: true,
+      notification: {
+        id: notification._id.toString(),
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        read: notification.read,
+        createdAt: notification.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error("Create notification error:", error);
+
+    return NextResponse.json(
+      { success: false, message: "Failed to create notification." },
+      { status: 500 }
+    );
+  }
+}
