@@ -1,37 +1,31 @@
-"use client";
 import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   useEffect(() => {
-    async function fetchNotifications() {
-      try {
-        const res = await fetch("/api/notifications");
-        const data = await res.json();
-        if (data.success) {
-          setNotifications(data.notifications);
-        }
-      } catch (error) {
-        console.error("Failed to fetch notifications:", error);
+    async function fetchData() {
+      const res = await fetch("/api/notifications");
+      const data = await res.json();
+      if (data.success) {
+        setNotifications(data.notifications);
+        setUnreadCount(data.unreadCount);
       }
     }
+    fetchData();
 
-    async function fetchUnreadCount() {
-      try {
-        const res = await fetch("/api/notifications/unread-count");
-        const data = await res.json();
-        if (data.success) {
-          setUnreadCount(data.unreadCount);
-        }
-      } catch (error) {
-        console.error("Failed to fetch unread count:", error);
-      }
-    }
+    const socket = io();
 
-    fetchNotifications();
-    fetchUnreadCount();
+    socket.on("notification:new", (notification) => {
+      setNotifications((prev) => [notification, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return { notifications, unreadCount };
