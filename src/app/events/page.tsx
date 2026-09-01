@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 type Event = {
   _id: string;
@@ -37,32 +38,26 @@ export default function EventsPage() {
 
         const params = new URLSearchParams();
 
-        // Search filter
         if (search.trim()) {
           params.set("search", search.trim());
         }
 
-        // Category filter
         if (category !== "All") {
           params.set("category", category);
         }
 
-        // Location filter
         if (location !== "All") {
           params.set("location", location);
         }
 
-        // Date filter
         if (dateFilter !== "All") {
           params.set("date", dateFilter.toLowerCase());
         }
 
-        // Price filter
         if (priceFilter !== "All") {
           params.set("price", priceFilter.toLowerCase());
         }
 
-        // Sorting
         if (sort !== "soonest") {
           params.set("sort", sort);
         }
@@ -158,232 +153,223 @@ export default function EventsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      {/* Navbar */}
-      <nav className="flex flex-col gap-4 border-b border-gray-800 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <Link
-          href="/"
-          className="text-xl font-bold"
-        >
-          EventApp
-        </Link>
+    <main className="min-h-screen bg-background text-foreground">
+      <Navbar />
 
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/dashboard"
-            className="rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-gray-200"
-          >
-            Dashboard
-          </Link>
+      {/* Page Header */}
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+          <div className="max-w-3xl">
+            <p className="mb-4 text-sm font-medium uppercase tracking-[0.25em] text-accent">
+              Explore events
+            </p>
 
-          <Link
-            href="/sign-in"
-            className="rounded-lg border border-gray-700 px-4 py-2.5 text-sm transition hover:bg-gray-800"
-          >
-            Sign In
-          </Link>
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+              Find something worth experiencing.
+            </h1>
 
-          <Link
-            href="/sign-up"
-            className="rounded-lg bg-white px-4 py-2.5 text-sm text-black transition hover:bg-gray-200"
-          >
-            Sign Up
-          </Link>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-foreground-secondary sm:text-lg">
+              Discover events by category, location, date, and price.
+              Find your next experience and book your place.
+            </p>
+          </div>
         </div>
-      </nav>
+      </section>
 
-      {/* Main Content */}
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        {/* Header */}
-        <div className="mb-10">
-          <p className="mb-3 text-sm uppercase tracking-[0.3em] text-gray-400">
-            Discover
-          </p>
-
-          <h1 className="text-4xl font-bold md:text-5xl">
-            Find your next event
-          </h1>
-
-          <p className="mt-4 max-w-2xl text-gray-400">
-            Discover concerts, conferences, sports, networking events and
-            more.
-          </p>
-        </div>
-
-        {/* Search */}
-        <div className="mb-8">
+      {/* Search & Filters */}
+      <section className="border-b border-border bg-background-secondary">
+        <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+          {/* Search */}
           <div className="relative">
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search events by title, description or location..."
-              className="w-full rounded-xl border border-gray-700 bg-gray-900 px-5 py-4 pr-12 text-white outline-none transition placeholder:text-gray-500 focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
+              className="w-full rounded-xl border border-border bg-card px-5 py-4 pr-12 text-foreground outline-none transition placeholder:text-foreground-muted focus:border-accent focus:ring-1 focus:ring-accent"
             />
 
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 transition hover:text-white"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground-muted transition hover:text-white"
                 aria-label="Clear search"
               >
                 ✕
               </button>
             )}
           </div>
-        </div>
 
-        {/* Category Filters */}
-        <div className="mb-8">
-          <h3 className="mb-3 text-sm font-medium text-gray-400">
-            Category
-          </h3>
+          {/* Filters */}
+          <div className="mt-8 space-y-7">
+            {/* Category */}
+            <div>
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
+                Category
+              </h3>
 
-          <div className="flex flex-wrap gap-3">
-            {categories.map((item) => (
-              <button
-                key={item}
-                type="button"
-                onClick={() => setCategory(item)}
-                className={`rounded-full border px-4 py-2 text-sm transition ${
-                  category === item
-                    ? "border-white bg-white text-black"
-                    : "border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
-                }`}
-              >
-                {item}
-              </button>
-            ))}
+              <div className="flex flex-wrap gap-2">
+                {categories.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setCategory(item)}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                      category === item
+                        ? "border-accent bg-accent text-white"
+                        : "border-border text-foreground-secondary hover:border-border-hover hover:bg-card hover:text-white"
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Location */}
+            <div>
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
+                Location
+              </h3>
+
+              <div className="flex flex-wrap gap-2">
+                {locations.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setLocation(item)}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                      location === item
+                        ? "border-accent bg-accent text-white"
+                        : "border-border text-foreground-secondary hover:border-border-hover hover:bg-card hover:text-white"
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Date + Price + Sort */}
+            <div className="grid gap-7 lg:grid-cols-3">
+              {/* Date */}
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
+                  Date
+                </h3>
+
+                <div className="flex flex-wrap gap-2">
+                  {dateFilters.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => setDateFilter(item.value)}
+                      className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                        dateFilter === item.value
+                          ? "border-accent bg-accent text-white"
+                          : "border-border text-foreground-secondary hover:border-border-hover hover:bg-card hover:text-white"
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price */}
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
+                  Price
+                </h3>
+
+                <div className="flex flex-wrap gap-2">
+                  {priceFilters.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => setPriceFilter(item.value)}
+                      className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                        priceFilter === item.value
+                          ? "border-accent bg-accent text-white"
+                          : "border-border text-foreground-secondary hover:border-border-hover hover:bg-card hover:text-white"
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sort */}
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground-muted">
+                  Sort by
+                </h3>
+
+                <div className="flex flex-wrap gap-2">
+                  {sortOptions.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => setSort(item.value)}
+                      className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                        sort === item.value
+                          ? "border-accent bg-accent text-white"
+                          : "border-border text-foreground-secondary hover:border-border-hover hover:bg-card hover:text-white"
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Location Filters */}
-        <div className="mb-8">
-          <h3 className="mb-3 text-sm font-medium text-gray-400">
-            Location
-          </h3>
+          {/* Filter Summary */}
+          <div className="mt-8 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              {hasActiveFilters ? (
+                <p className="text-sm text-foreground-secondary">
+                  Active filters are applied to your search.
+                </p>
+              ) : (
+                <p className="text-sm text-foreground-muted">
+                  Showing all available events.
+                </p>
+              )}
+            </div>
 
-          <div className="flex flex-wrap gap-3">
-            {locations.map((item) => (
-              <button
-                key={item}
-                type="button"
-                onClick={() => setLocation(item)}
-                className={`rounded-full border px-4 py-2 text-sm transition ${
-                  location === item
-                    ? "border-white bg-white text-black"
-                    : "border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
-                }`}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Date Filters */}
-        <div className="mb-8">
-          <h3 className="mb-3 text-sm font-medium text-gray-400">
-            Date
-          </h3>
-
-          <div className="flex flex-wrap gap-3">
-            {dateFilters.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setDateFilter(item.value)}
-                className={`rounded-full border px-4 py-2 text-sm transition ${
-                  dateFilter === item.value
-                    ? "border-white bg-white text-black"
-                    : "border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Price Filters */}
-        <div className="mb-8">
-          <h3 className="mb-3 text-sm font-medium text-gray-400">
-            Price
-          </h3>
-
-          <div className="flex flex-wrap gap-3">
-            {priceFilters.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setPriceFilter(item.value)}
-                className={`rounded-full border px-4 py-2 text-sm transition ${
-                  priceFilter === item.value
-                    ? "border-white bg-white text-black"
-                    : "border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Sorting */}
-        <div className="mb-6">
-          <h3 className="mb-3 text-sm font-medium text-gray-400">
-            Sort By
-          </h3>
-
-          <div className="flex flex-wrap gap-3">
-            {sortOptions.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setSort(item.value)}
-                className={`rounded-full border px-4 py-2 text-sm transition ${
-                  sort === item.value
-                    ? "border-white bg-white text-black"
-                    : "border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Clear Filters */}
-        <div className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-gray-800 pb-8">
-          <div>
             {hasActiveFilters && (
-              <p className="text-sm text-gray-500">
-                Filters are currently active
-              </p>
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="self-start rounded-lg border border-border-hover px-4 py-2 text-sm font-medium text-foreground-secondary transition hover:bg-card hover:text-white sm:self-auto"
+              >
+                Clear Filters
+              </button>
             )}
           </div>
-
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="rounded-lg border border-gray-700 px-5 py-2.5 text-sm font-medium text-gray-300 transition hover:border-gray-500 hover:bg-gray-800 hover:text-white"
-            >
-              Clear Filters
-            </button>
-          )}
         </div>
+      </section>
 
-        {/* Events */}
-        <div>
-          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-2xl font-semibold">
-              Upcoming Events
-            </h2>
+      {/* Events */}
+      <section>
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+          <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-accent">
+                Discover
+              </p>
+
+              <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+                Upcoming Events
+              </h2>
+            </div>
 
             {!loading && (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-foreground-muted">
                 {events.length}{" "}
                 {events.length === 1 ? "event" : "events"} found
               </p>
@@ -392,28 +378,45 @@ export default function EventsPage() {
 
           {/* Loading */}
           {loading ? (
-            <div className="py-10 text-center">
-              <p className="text-gray-400">
-                Loading events...
-              </p>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="overflow-hidden rounded-2xl border border-border bg-card"
+                >
+                  <div className="h-52 animate-pulse bg-background-secondary" />
+
+                  <div className="space-y-4 p-6">
+                    <div className="h-3 w-20 animate-pulse rounded bg-border" />
+                    <div className="h-5 w-3/4 animate-pulse rounded bg-border" />
+                    <div className="h-3 w-1/2 animate-pulse rounded bg-border" />
+                    <div className="h-3 w-2/3 animate-pulse rounded bg-border" />
+                    <div className="h-5 w-24 animate-pulse rounded bg-border" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : events.length === 0 ? (
             /* Empty State */
-            <div className="rounded-xl border border-gray-800 bg-gray-900 px-6 py-12 text-center">
-              <h3 className="text-xl font-semibold">
+            <div className="rounded-2xl border border-border bg-card px-6 py-16 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border-hover bg-background-secondary text-accent">
+                —
+              </div>
+
+              <h3 className="mt-5 text-xl font-semibold">
                 No events found
               </h3>
 
-              <p className="mt-2 text-gray-400">
-                Try changing your search or filters to find available
-                events.
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-foreground-secondary">
+                We couldn't find any events matching your current search
+                and filters. Try adjusting your criteria.
               </p>
 
               {hasActiveFilters && (
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="mt-6 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-gray-200"
+                  className="mt-6 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-hover"
                 >
                   Clear Filters
                 </button>
@@ -426,47 +429,63 @@ export default function EventsPage() {
                 <Link
                   key={event._id}
                   href={`/events/${event._id}`}
-                  className="group overflow-hidden rounded-xl border border-gray-800 bg-gray-900 transition hover:border-gray-600"
+                  className="group overflow-hidden rounded-2xl border border-border bg-card transition duration-200 hover:-translate-y-1 hover:border-border-hover hover:shadow-2xl"
                 >
-                  {/* Event Image */}
-                  <div className="overflow-hidden">
+                  {/* Image */}
+                  <div className="relative overflow-hidden">
                     <img
                       src={event.image}
                       alt={event.title}
-                      className="h-52 w-full object-cover transition duration-300 group-hover:scale-105"
+                      className="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
                     />
+
+                    <div className="absolute left-4 top-4 rounded-lg border border-white/10 bg-black/70 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
+                      {event.category}
+                    </div>
                   </div>
 
-                  {/* Event Information */}
-                  <div className="p-5">
-                    <p className="mb-2 text-sm text-gray-400">
-                      {event.category}
-                    </p>
-
-                    <h3 className="text-xl font-semibold transition group-hover:text-gray-300">
+                  {/* Information */}
+                  <div className="p-6">
+                    <h3 className="line-clamp-2 text-xl font-semibold leading-tight transition group-hover:text-accent">
                       {event.title}
                     </h3>
 
-                    <p className="mt-2 text-sm text-gray-400">
-                      {event.location}
+                    <p className="mt-3 line-clamp-2 text-sm leading-6 text-foreground-secondary">
+                      {event.description}
                     </p>
 
-                    <p className="mt-2 text-sm text-gray-500">
-                      {new Date(event.date).toLocaleDateString(
-                        "en-KE",
-                        {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        }
-                      )}
-                    </p>
+                    <div className="mt-5 space-y-2 border-t border-border pt-5">
+                      <div className="flex items-center gap-2 text-sm text-foreground-secondary">
+                        <span className="text-accent">●</span>
+                        <span>{event.location}</span>
+                      </div>
 
-                    <p className="mt-4 font-medium">
-                      {event.price === 0
-                        ? "Free"
-                        : `KES ${event.price.toLocaleString()}`}
-                    </p>
+                      <div className="flex items-center gap-2 text-sm text-foreground-secondary">
+                        <span className="text-accent">●</span>
+                        <span>
+                          {new Date(event.date).toLocaleDateString(
+                            "en-KE",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-3">
+                        <span className="font-semibold text-white">
+                          {event.price === 0
+                            ? "Free"
+                            : `KES ${event.price.toLocaleString()}`}
+                        </span>
+
+                        <span className="text-sm font-medium text-accent transition group-hover:text-white">
+                          View Event →
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </Link>
               ))}
