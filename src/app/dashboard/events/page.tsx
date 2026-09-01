@@ -117,37 +117,7 @@ export default function OrganizerEventsPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="border-b border-gray-800">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <Link href="/" className="text-xl font-bold">
-            EventApp
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <Link
-              href="/events"
-              className="text-sm text-gray-400 hover:text-white"
-            >
-              Browse Events
-            </Link>
-
-            <Link
-              href="/dashboard"
-              className="rounded-lg border border-gray-700 px-4 py-2 text-sm hover:bg-gray-800"
-            >
-              Dashboard
-            </Link>
-
-            <Link
-              href="/dashboard/events/create"
-              className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-gray-200"
-            >
-              + Create Event
-            </Link>
-          </div>
-        </div>
-      </nav>
-
+     
       <section className="mx-auto max-w-7xl px-6 py-12">
         <div className="mb-10">
           <p className="text-sm uppercase tracking-[0.3em] text-gray-400">

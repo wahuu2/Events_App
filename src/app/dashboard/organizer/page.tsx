@@ -53,23 +53,7 @@ export default function OrganizerDashboardPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between border-b border-gray-800 px-8 py-5">
-        <Link
-          href="/"
-          className="text-xl font-bold"
-        >
-          EventApp
-        </Link>
-
-        <Link
-          href="/events"
-          className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800"
-        >
-          Browse Events
-        </Link>
-      </nav>
-
+      
       <section className="mx-auto max-w-7xl px-6 py-12">
         {/* Header */}
         <div>

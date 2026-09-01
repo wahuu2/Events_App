@@ -197,42 +197,7 @@ const [statusFilter, setStatusFilter] = useState<
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      {/* Navigation */}
-      <nav className="border-b border-gray-800">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <Link
-            href="/"
-            className="text-xl font-bold"
-          >
-            EventApp
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/events"
-              className="rounded-lg border border-gray-700 px-4 py-2 text-sm hover:bg-gray-800"
-            >
-              Browse Events
-            </Link>
-
-            <Link
-              href="/dashboard/organizer"
-              className="rounded-lg border border-gray-700 px-4 py-2 text-sm hover:bg-gray-800"
-            >
-              Dashboard
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        {/* Back */}
-        <Link
-          href="/dashboard/events"
-          className="text-sm text-gray-400 hover:text-white"
-        >
-          ← Back to My Events
-        </Link>
+         <section className="mx-auto max-w-7xl px-6 py-12">
 
         {/* Event Header */}
         <div className="mt-6 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">

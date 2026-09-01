@@ -104,24 +104,7 @@ export default function CreateEventPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="border-b border-gray-800">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-5">
-          <Link
-            href="/"
-            className="text-xl font-bold"
-          >
-            EventApp
-          </Link>
-
-          <Link
-            href="/dashboard/events"
-            className="rounded-lg border border-gray-700 px-4 py-2 text-sm hover:bg-gray-800"
-          >
-            Back to My Events
-          </Link>
-        </div>
-      </nav>
-
+      
       <section className="mx-auto max-w-3xl px-6 py-12">
         <div className="mb-8">
           <p className="text-sm uppercase tracking-[0.3em] text-gray-400">

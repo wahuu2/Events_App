@@ -12,14 +12,26 @@ export function useNotifications() {
         const data = await res.json();
         if (data.success) {
           setNotifications(data.notifications);
-          setUnreadCount(data.unreadCount);
         }
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
       }
     }
 
+    async function fetchUnreadCount() {
+      try {
+        const res = await fetch("/api/notifications/unread-count");
+        const data = await res.json();
+        if (data.success) {
+          setUnreadCount(data.unreadCount);
+        }
+      } catch (error) {
+        console.error("Failed to fetch unread count:", error);
+      }
+    }
+
     fetchNotifications();
+    fetchUnreadCount();
   }, []);
 
   return { notifications, unreadCount };
