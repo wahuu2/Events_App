@@ -33,6 +33,22 @@ lastName: {
       enum: ["user", "organizer"],
       default: "user",
     },
+     notificationPreferences: {
+    type: [String],
+    enum: [
+      "booking_confirmed",
+      "payment_successful",
+      "ticket_generated",
+      "event_updated",
+      "event_cancelled",
+      "event_reminder",
+      "success",
+      "warning",
+      "info",
+      "error",
+    ],
+    default: ["success", "warning", "info", "error"], // default to all
+  },
   },
   {
     timestamps: true,

@@ -113,6 +113,25 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   >
     Clear old notifications
   </button>
+
+   {/* Preferences Section */}
+    <div className="mt-4">
+      <h4 className="text-sm font-semibold">Notification Preferences</h4>
+      <button
+        onClick={async () => {
+          await fetch("/api/notifications/preferences", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              preferences: ["event_reminder", "success"], // example
+            }),
+          });
+        }}
+        className="text-xs text-indigo-400 hover:text-indigo-600 mt-2"
+      >
+        Save Preferences
+      </button>
+    </div>
 </div>
 
               )}
