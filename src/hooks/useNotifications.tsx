@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
@@ -18,9 +19,18 @@ export function useNotifications() {
 
     const socket = io();
 
+    // When a new notification arrives
     socket.on("notification:new", (notification) => {
       setNotifications((prev) => [notification, ...prev]);
-      setUnreadCount((prev) => prev + 1);
+      setUnreadCount((prev) => prev + 1); // increment badge instantly
+    });
+
+    // When a notification is marked as read
+    socket.on("notification:read", (id) => {
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+      setUnreadCount((prev) => Math.max(prev - 1, 0)); // decrement badge instantly
     });
 
     return () => {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/database";
 import Notification from "@/database/notification.model";
 import { getCurrentUser } from "@/lib/auth";
+import { getIO } from "@/lib/socket";
 
 export async function PATCH(
   request: NextRequest,
@@ -34,6 +35,15 @@ export async function PATCH(
       );
     }
 
+    // 4. Emit real-time "read" event
+    try {
+      const io = getIO();
+      io.to(user._id.toString()).emit("notification:read", notification._id.toString());
+    } catch (emitError) {
+      console.error("Socket emit error:", emitError);
+    }
+
+    // 5. Return updated notification
     return NextResponse.json({
       success: true,
       notification: {
@@ -43,6 +53,7 @@ export async function PATCH(
         message: notification.message,
         read: notification.read,
         createdAt: notification.createdAt,
+        updatedAt: notification.updatedAt,
       },
     });
   } catch (error) {
