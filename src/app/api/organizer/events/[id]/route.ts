@@ -209,25 +209,29 @@ export async function PATCH(
 
     const user = await getCurrentUser();
 
-    if (!user || user.role !== "organizer") {
+    if (!user) {
       return NextResponse.json(
         {
           success: false,
-          message: "Unauthorized",
+          message: "You must be signed in",
         },
         { status: 401 }
       );
     }
 
+    if (user.role !== "organizer") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Only organizers can update events",
+        },
+        { status: 403 }
+      );
+    }
+
     await connectToDatabase();
 
-    const body = await req.json();
-
-    const event = await Event.findByIdAndUpdate(
-      id,
-      body,
-      { new: true }
-    );
+    const event = await Event.findById(id);
 
     if (!event) {
       return NextResponse.json(
@@ -239,6 +243,93 @@ export async function PATCH(
       );
     }
 
+    // Organizer can only update their own events
+    if (event.organizer.toString() !== user._id.toString()) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "You can only update your own events",
+        },
+        { status: 403 }
+      );
+    }
+
+    const body = await req.json();
+
+    const allowedFields = [
+      "title",
+      "description",
+      "image",
+      "location",
+      "date",
+      "time",
+      "category",
+      "price",
+      "capacity",
+    ];
+
+    // Update only allowed fields
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        event[field] = body[field];
+      }
+    }
+
+    // Validate required text fields
+    if (
+      !event.title ||
+      !event.description ||
+      !event.image ||
+      !event.location ||
+      !event.date ||
+      !event.time ||
+      !event.category
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Please provide all required event fields.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate price
+    const eventPrice = Number(event.price);
+
+    if (Number.isNaN(eventPrice) || eventPrice < 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Price must be a valid number greater than or equal to 0.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate capacity
+    const eventCapacity = Number(event.capacity);
+
+    if (
+      Number.isNaN(eventCapacity) ||
+      !Number.isInteger(eventCapacity) ||
+      eventCapacity < 1
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Capacity must be a whole number greater than 0.",
+        },
+        { status: 400 }
+      );
+    }
+
+    event.price = eventPrice;
+    event.capacity = eventCapacity;
+
+    await event.save();
+
     await createNotification({
       userId: user._id.toString(),
       type: "event_updated",
@@ -249,6 +340,7 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
+      message: "Event updated successfully",
       event,
     });
   } catch (error) {

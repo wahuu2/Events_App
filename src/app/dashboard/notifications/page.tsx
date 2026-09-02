@@ -145,49 +145,49 @@ export default function NotificationsPage() {
     switch (type) {
       case "booking_confirmed":
         return (
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-500/10 text-green-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/10 text-green-400 sm:h-11 sm:w-11">
             <CheckIcon className="h-5 w-5" />
           </div>
         );
 
       case "payment_successful":
         return (
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400 sm:h-11 sm:w-11">
             $
           </div>
         );
 
       case "ticket_generated":
         return (
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-purple-500/10 text-purple-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-500/10 text-purple-400 sm:h-11 sm:w-11">
             T
           </div>
         );
 
       case "new_booking":
         return (
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-400 sm:h-11 sm:w-11">
             +
           </div>
         );
 
       case "event_updated":
         return (
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-400 sm:h-11 sm:w-11">
             ↻
           </div>
         );
 
       case "event_cancelled":
         return (
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-400 sm:h-11 sm:w-11">
             !
           </div>
         );
 
       default:
         return (
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gray-500/10 text-gray-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-500/10 text-gray-400 sm:h-11 sm:w-11">
             <BellIcon className="h-5 w-5" />
           </div>
         );
@@ -233,18 +233,21 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <div className="mb-8 flex items-center justify-between gap-4">
-        <div>
+    <div className="mx-auto w-full max-w-4xl px-0">
+      {/* Header */}
+      <div className="mb-6 flex flex-col gap-5 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <div className="flex items-center gap-3">
-            <BellIcon className="h-7 w-7 text-gray-300" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card">
+              <BellIcon className="h-5 w-5 text-accent" />
+            </div>
 
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Notifications
             </h1>
           </div>
 
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-foreground-secondary">
             Stay updated with your bookings, payments, tickets,
             and events.
           </p>
@@ -254,7 +257,7 @@ export default function NotificationsPage() {
           type="button"
           onClick={fetchNotifications}
           disabled={loading}
-          className="flex items-center gap-2 rounded-lg border border-gray-700 px-4 py-2 text-sm text-gray-300 transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg border border-border-hover px-4 py-2.5 text-sm font-medium text-foreground-secondary transition hover:bg-card hover:text-white disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
           <ArrowPathIcon
             className={`h-4 w-4 ${
@@ -265,9 +268,10 @@ export default function NotificationsPage() {
         </button>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-4">
-        <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
-          <p className="text-sm text-gray-500">
+      {/* Stats */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="rounded-xl border border-border bg-card p-5">
+          <p className="text-xs font-medium uppercase tracking-wider text-foreground-muted">
             Total notifications
           </p>
 
@@ -276,8 +280,8 @@ export default function NotificationsPage() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
-          <p className="text-sm text-gray-500">
+        <div className="rounded-xl border border-border bg-card p-5">
+          <p className="text-xs font-medium uppercase tracking-wider text-foreground-muted">
             Unread
           </p>
 
@@ -287,38 +291,42 @@ export default function NotificationsPage() {
         </div>
       </div>
 
+      {/* Error */}
       {error && (
         <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
-          <p className="text-sm text-red-400">{error}</p>
+          <p className="text-sm leading-6 text-red-400">
+            {error}
+          </p>
 
           <button
             type="button"
             onClick={fetchNotifications}
-            className="mt-2 text-sm text-gray-300 underline hover:text-white"
+            className="mt-2 text-sm font-medium text-foreground-secondary underline transition hover:text-white"
           >
             Try again
           </button>
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900">
+      {/* Notifications */}
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         {loading ? (
-          <div className="px-6 py-16 text-center">
-            <ArrowPathIcon className="mx-auto h-7 w-7 animate-spin text-gray-600" />
+          <div className="px-5 py-16 text-center sm:px-6">
+            <ArrowPathIcon className="mx-auto h-7 w-7 animate-spin text-foreground-muted" />
 
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="mt-4 text-sm text-foreground-muted">
               Loading notifications...
             </p>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="px-6 py-16 text-center">
-            <BellIcon className="mx-auto h-12 w-12 text-gray-700" />
+          <div className="px-5 py-16 text-center sm:px-6">
+            <BellIcon className="mx-auto h-12 w-12 text-foreground-muted" />
 
-            <h2 className="mt-4 text-lg font-semibold text-gray-300">
+            <h2 className="mt-4 text-lg font-semibold text-foreground-secondary">
               No notifications yet
             </h2>
 
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-foreground-muted">
               Notifications about your EventApp activity will
               appear here.
             </p>
@@ -328,22 +336,24 @@ export default function NotificationsPage() {
             {notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`flex gap-4 border-b border-gray-800 p-5 transition last:border-b-0 ${
+                className={`flex gap-3 border-b border-border p-4 transition last:border-b-0 sm:gap-4 sm:p-5 ${
                   notification.read
-                    ? "bg-gray-900"
-                    : "bg-gray-800/40"
+                    ? "bg-card"
+                    : "bg-background-secondary"
                 }`}
               >
+                {/* Icon */}
                 {getNotificationIcon(notification.type)}
 
+                {/* Content */}
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start gap-2">
                         <h2
-                          className={`text-sm ${
+                          className={`min-w-0 break-words text-sm leading-5 ${
                             notification.read
-                              ? "font-medium text-gray-400"
+                              ? "font-medium text-foreground-secondary"
                               : "font-semibold text-white"
                           }`}
                         >
@@ -351,20 +361,21 @@ export default function NotificationsPage() {
                         </h2>
 
                         {!notification.read && (
-                          <span className="h-2 w-2 rounded-full bg-blue-500" />
+                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent" />
                         )}
                       </div>
 
-                      <p className="mt-1 text-sm leading-6 text-gray-500">
+                      <p className="mt-1.5 break-words text-sm leading-6 text-foreground-muted">
                         {notification.message}
                       </p>
 
-                      <p className="mt-2 text-xs text-gray-600">
+                      <p className="mt-2 text-xs text-foreground-muted">
                         {formatDate(notification.createdAt)}
                       </p>
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-2">
+                    {/* Actions */}
+                    <div className="flex shrink-0 items-center gap-2 self-start">
                       <button
                         type="button"
                         disabled={
@@ -376,7 +387,7 @@ export default function NotificationsPage() {
                             !notification.read
                           )
                         }
-                        className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-800 hover:text-white disabled:opacity-50"
+                        className="rounded-lg border border-transparent p-2 text-foreground-muted transition hover:border-border hover:bg-background-secondary hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                         title={
                           notification.read
                             ? "Mark as unread"
@@ -394,7 +405,7 @@ export default function NotificationsPage() {
                         onClick={() =>
                           deleteNotification(notification.id)
                         }
-                        className="rounded-lg p-2 text-gray-500 transition hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
+                        className="rounded-lg border border-transparent p-2 text-foreground-muted transition hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
                         title="Delete notification"
                       >
                         <TrashIcon className="h-5 w-5" />
@@ -407,6 +418,9 @@ export default function NotificationsPage() {
           </div>
         )}
       </div>
+
+      {/* Bottom spacing */}
+      <div className="h-8" />
     </div>
   );
 }

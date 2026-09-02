@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { connectToDatabase } from "@/database";
 import Ticket from "@/database/ticket.model";
+import Event from "@/database/event.model";
 import { getCurrentUser } from "@/lib/auth";
+import { strictRateLimiter } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Get currently logged-in user
+    // 1. Get currently logged-in user.
     const user = await getCurrentUser();
 
     if (!user) {
@@ -19,7 +21,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Only organizers can verify tickets
+    // 2. Only organizers can verify tickets.
     if (user.role !== "organizer") {
       return NextResponse.json(
         {
@@ -30,13 +32,69 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Read request body
-    const body = await request.json();
+    // 3. Strict rate limiting.
+    // Maximum: 5 ticket verification attempts per minute
+    // per organizer.
+    const rateLimit = await strictRateLimiter.limit(
+      `ticket:verify:${user._id.toString()}`
+    );
 
-    const { ticketNumber } = body;
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Too many ticket verification attempts. Please try again later.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(
+              (rateLimit.reset - Date.now()) / 1000
+            ).toString(),
+          },
+        }
+      );
+    }
 
-    // 4. Validate ticket number
-    if (!ticketNumber) {
+    // 4. Read request body safely.
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid JSON request body.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (
+      typeof body !== "object" ||
+      body === null ||
+      Array.isArray(body)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Request body must be a valid object.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const requestBody = body as Record<string, unknown>;
+
+    const { ticketNumber } = requestBody;
+
+    // 5. Validate ticket number.
+    if (
+      typeof ticketNumber !== "string" ||
+      !ticketNumber.trim()
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -46,18 +104,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 5. Connect to database
+    const cleanTicketNumber = ticketNumber.trim();
+
+    // Prevent excessively large ticket-number input.
+    if (cleanTicketNumber.length > 200) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Ticket number is too long.",
+        },
+        { status: 400 }
+      );
+    }
+
     await connectToDatabase();
 
-    // 6. Find ticket
+    // 6. Find ticket by ticket number.
     const ticket = await Ticket.findOne({
-      ticketNumber: ticketNumber.trim(),
-    })
-      .populate("event")
-      .populate("booking")
-      .populate("user");
+      ticketNumber: cleanTicketNumber,
+    });
 
-    // 7. Ticket does not exist
     if (!ticket) {
       return NextResponse.json(
         {
@@ -69,7 +135,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 8. Ticket has already been used
+    // 7. Find the event associated with this ticket.
+    const event = await Event.findById(ticket.event).select(
+      "title image location date time category organizer"
+    );
+
+    if (!event) {
+      return NextResponse.json(
+        {
+          success: false,
+          valid: false,
+          message:
+            "Event associated with this ticket was not found.",
+        },
+        { status: 404 }
+      );
+    }
+
+    // 8. CRITICAL SECURITY CHECK:
+    // Only the organizer who owns the event can verify its tickets.
+    if (
+      event.organizer.toString() !==
+      user._id.toString()
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          valid: false,
+          message:
+            "You can only verify tickets for your own events.",
+        },
+        { status: 403 }
+      );
+    }
+
+    // 9. Ticket has already been used.
     if (ticket.status === "used") {
       return NextResponse.json(
         {
@@ -77,15 +177,20 @@ export async function POST(request: NextRequest) {
           valid: false,
           message: "This ticket has already been used.",
           ticket: {
+            id: ticket._id,
             ticketNumber: ticket.ticketNumber,
             status: ticket.status,
+            event: {
+              id: event._id,
+              title: event.title,
+            },
           },
         },
         { status: 400 }
       );
     }
 
-    // 9. Ticket has been cancelled
+    // 10. Ticket has been cancelled.
     if (ticket.status === "cancelled") {
       return NextResponse.json(
         {
@@ -93,15 +198,20 @@ export async function POST(request: NextRequest) {
           valid: false,
           message: "This ticket has been cancelled.",
           ticket: {
+            id: ticket._id,
             ticketNumber: ticket.ticketNumber,
             status: ticket.status,
+            event: {
+              id: event._id,
+              title: event.title,
+            },
           },
         },
         { status: 400 }
       );
     }
 
-    // 10. Ticket is valid
+    // 11. Ticket is valid.
     if (ticket.status === "valid") {
       ticket.status = "used";
 
@@ -110,19 +220,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         valid: true,
-        message: "Ticket verified successfully. Entry allowed.",
+        message:
+          "Ticket verified successfully. Entry allowed.",
         ticket: {
           id: ticket._id,
           ticketNumber: ticket.ticketNumber,
           status: ticket.status,
-          event: ticket.event,
-          booking: ticket.booking,
-          user: ticket.user,
+          event: {
+            id: event._id,
+            title: event.title,
+            location: event.location,
+            date: event.date,
+            time: event.time,
+          },
         },
       });
     }
 
-    // 11. Unexpected ticket status
+    // 12. Unexpected ticket status.
     return NextResponse.json(
       {
         success: false,

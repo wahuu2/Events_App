@@ -8,6 +8,7 @@ import { getCurrentUser } from "@/lib/auth";
 import Ticket from "@/database/ticket.model";
 import Event from "@/database/event.model";
 import { createNotification } from "@/lib/notifications";
+import { sensitiveRateLimiter } from "@/lib/rate-limit";
 
 function generateTransactionReference() {
   return `PAY-${Date.now().toString(36).toUpperCase()}-${Math.random()
@@ -25,6 +26,7 @@ function generateTicketNumber() {
 
 export async function POST(request: NextRequest) {
   try {
+    // 1. Authenticate the user.
     const user = await getCurrentUser();
 
     if (!user) {
@@ -37,10 +39,66 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const { bookingId, method } = body;
+    // 2. Rate-limit payment creation per authenticated user.
+    const rateLimit = await sensitiveRateLimiter.limit(
+      `payment:create:${user._id.toString()}`
+    );
 
-    if (!bookingId) {
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Too many payment attempts. Please try again later.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(
+              (rateLimit.reset - Date.now()) / 1000
+            ).toString(),
+          },
+        }
+      );
+    }
+
+    // 3. Safely parse the request body.
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid request body.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 4. Validate request body.
+    if (
+      typeof body !== "object" ||
+      body === null ||
+      Array.isArray(body)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid request body.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const { bookingId, method } = body as {
+      bookingId?: unknown;
+      method?: unknown;
+    };
+
+    // 5. Validate booking ID.
+    if (typeof bookingId !== "string" || !bookingId.trim()) {
       return NextResponse.json(
         {
           success: false,
@@ -50,7 +108,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+    const trimmedBookingId = bookingId.trim();
+
+    if (!mongoose.Types.ObjectId.isValid(trimmedBookingId)) {
       return NextResponse.json(
         {
           success: false,
@@ -60,7 +120,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!method || !["mpesa", "card"].includes(method)) {
+    // 6. Validate payment method.
+    if (
+      typeof method !== "string" ||
+      !["mpesa", "card"].includes(method)
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -72,7 +136,8 @@ export async function POST(request: NextRequest) {
 
     await connectToDatabase();
 
-    const booking = await Booking.findById(bookingId);
+    // 7. Find the booking.
+    const booking = await Booking.findById(trimmedBookingId);
 
     if (!booking) {
       return NextResponse.json(
@@ -84,6 +149,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 8. Verify booking ownership.
     if (booking.user.toString() !== user._id.toString()) {
       return NextResponse.json(
         {
@@ -94,6 +160,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 9. Prevent payment for already confirmed bookings.
     if (booking.status === "confirmed") {
       return NextResponse.json(
         {
@@ -104,6 +171,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 10. Prevent payment for cancelled bookings.
     if (booking.status === "cancelled") {
       return NextResponse.json(
         {
@@ -114,6 +182,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 11. Prevent payment for free bookings.
     if (booking.totalAmount <= 0) {
       return NextResponse.json(
         {
@@ -124,6 +193,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 12. Prevent duplicate payment creation.
     const existingPayment = await Payment.findOne({
       booking: booking._id,
       status: {
@@ -141,13 +211,15 @@ export async function POST(request: NextRequest) {
             amount: existingPayment.amount,
             method: existingPayment.method,
             status: existingPayment.status,
-            transactionReference: existingPayment.transactionReference,
+            transactionReference:
+              existingPayment.transactionReference,
           },
         },
         { status: 400 }
       );
     }
 
+    // 13. Create the payment.
     const payment = await Payment.create({
       booking: booking._id,
       user: user._id,
@@ -187,6 +259,7 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    // 1. Authenticate the user.
     const user = await getCurrentUser();
 
     if (!user) {
@@ -199,10 +272,70 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const { paymentId, action } = body;
+    // 2. Rate-limit payment processing per authenticated user.
+    const rateLimit = await sensitiveRateLimiter.limit(
+      `payment:process:${user._id.toString()}`
+    );
 
-    if (!paymentId || !mongoose.Types.ObjectId.isValid(paymentId)) {
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Too many payment processing attempts. Please try again later.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(
+              (rateLimit.reset - Date.now()) / 1000
+            ).toString(),
+          },
+        }
+      );
+    }
+
+    // 3. Safely parse the request body.
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid request body.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 4. Validate request body.
+    if (
+      typeof body !== "object" ||
+      body === null ||
+      Array.isArray(body)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid request body.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const { paymentId, action } = body as {
+      paymentId?: unknown;
+      action?: unknown;
+    };
+
+    // 5. Validate payment ID.
+    if (
+      typeof paymentId !== "string" ||
+      !paymentId.trim() ||
+      !mongoose.Types.ObjectId.isValid(paymentId.trim())
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -212,7 +345,13 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    if (!["success", "fail"].includes(action)) {
+    const trimmedPaymentId = paymentId.trim();
+
+    // 6. Validate payment action.
+    if (
+      typeof action !== "string" ||
+      !["success", "fail"].includes(action)
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -224,7 +363,8 @@ export async function PATCH(request: NextRequest) {
 
     await connectToDatabase();
 
-    const payment = await Payment.findById(paymentId);
+    // 7. Find the payment.
+    const payment = await Payment.findById(trimmedPaymentId);
 
     if (!payment) {
       return NextResponse.json(
@@ -236,6 +376,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // 8. Verify payment ownership.
     if (payment.user.toString() !== user._id.toString()) {
       return NextResponse.json(
         {
@@ -246,6 +387,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // 9. Prevent processing an already completed payment.
     if (["successful", "failed"].includes(payment.status)) {
       return NextResponse.json(
         {
@@ -256,6 +398,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // 10. Find the associated booking.
     const booking = await Booking.findById(payment.booking);
 
     if (!booking) {
@@ -268,6 +411,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // 11. Double ownership check.
     if (booking.user.toString() !== user._id.toString()) {
       return NextResponse.json(
         {
@@ -278,6 +422,18 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // 12. Prevent payment processing for cancelled bookings.
+    if (booking.status === "cancelled") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "This booking has been cancelled.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 13. Handle failed payment.
     if (action === "fail") {
       payment.status = "failed";
       await payment.save();
@@ -290,21 +446,26 @@ export async function PATCH(request: NextRequest) {
           amount: payment.amount,
           method: payment.method,
           status: payment.status,
-          transactionReference: payment.transactionReference,
+          transactionReference:
+            payment.transactionReference,
         },
       });
     }
 
+    // 14. Mark payment as successful.
     payment.status = "successful";
     await payment.save();
 
+    // 15. Confirm the booking.
     booking.status = "confirmed";
     await booking.save();
 
+    // 16. Find existing tickets.
     let tickets = await Ticket.find({
       booking: booking._id,
     });
 
+    // 17. Generate tickets only when none exist.
     if (tickets.length === 0) {
       tickets = [];
 
@@ -321,6 +482,7 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
+    // 18. Find the associated event.
     const event = await Event.findById(booking.event);
 
     if (!event) {
@@ -333,6 +495,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // 19. Create notifications.
     await Promise.all([
       createNotification({
         userId: booking.user.toString(),
@@ -366,21 +529,24 @@ export async function PATCH(request: NextRequest) {
         userId: event.organizer.toString(),
         type: "new_booking",
         title: "New booking received",
-        message: `A new booking for ${event.title} has been confirmed. ${booking.quantity} ticket${
-          booking.quantity !== 1 ? "s" : ""
-        } were booked.`,
+        message: `A new booking for ${event.title} has been confirmed. ${
+          booking.quantity
+        } ticket${booking.quantity !== 1 ? "s" : ""} were booked.`,
       }),
     ]);
 
+    // 20. Return successful payment result.
     return NextResponse.json({
       success: true,
-      message: "Payment successful. Booking confirmed and tickets generated.",
+      message:
+        "Payment successful. Booking confirmed and tickets generated.",
       payment: {
         id: payment._id,
         amount: payment.amount,
         method: payment.method,
         status: payment.status,
-        transactionReference: payment.transactionReference,
+        transactionReference:
+          payment.transactionReference,
       },
       booking: {
         id: booking._id,
@@ -395,18 +561,15 @@ export async function PATCH(request: NextRequest) {
         status: ticket.status,
       })),
     });
-} catch (error) {
-  console.error("Process payment error:", error);
+  } catch (error) {
+    console.error("Process payment error:", error);
 
-  return NextResponse.json(
-    {
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Failed to process payment.",
-    },
-    { status: 500 }
-  );
-}
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to process payment.",
+      },
+      { status: 500 }
+    );
+  }
 }

@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export async function DELETE(request: NextRequest) {
   try {
+    // 1. Authenticate the current user.
     const user = await getCurrentUser();
 
     if (!user) {
@@ -18,11 +19,23 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // 2. Connect to the database.
     await connectToDatabase();
 
+    // 3. Calculate the cleanup cutoff date.
+    // Only read notifications older than 30 days will be removed.
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+    // 4. Delete ONLY notifications that:
+    //    - belong to the current user
+    //    - have already been read
+    //    - are older than 30 days
+    //
+    // This prevents the user from deleting:
+    //    - another user's notifications
+    //    - unread notifications
+    //    - recent notifications
     const result = await Notification.deleteMany({
       user: user._id,
       read: true,
@@ -31,14 +44,19 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
+    // 5. Return cleanup result.
     return NextResponse.json({
       success: true,
-      message: "Old notifications cleaned up successfully.",
+      message:
+        result.deletedCount > 0
+          ? "Old notifications cleaned up successfully."
+          : "No old read notifications needed to be cleaned up.",
       deletedCount: result.deletedCount,
     });
   } catch (error) {
     console.error("Cleanup notifications error:", error);
 
+    // Do not expose internal database errors to the client.
     return NextResponse.json(
       {
         success: false,

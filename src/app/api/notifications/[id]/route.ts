@@ -41,6 +41,8 @@ export async function GET(
 
     await connectToDatabase();
 
+    // Ownership protection:
+    // the notification must belong to the current user.
     const notification = await Notification.findOne({
       _id: id,
       user: user._id,
@@ -124,13 +126,17 @@ export async function PATCH(
 
     await connectToDatabase();
 
+    // Ownership protection:
+    // only the owner can modify this notification.
     const notification = await Notification.findOneAndUpdate(
       {
         _id: id,
         user: user._id,
       },
       {
-        read: body.read,
+        $set: {
+          read: body.read,
+        },
       },
       {
         new: true,
@@ -174,6 +180,8 @@ export async function PATCH(
     );
   }
 }
+
+// DELETE — Delete one notification
 export async function DELETE(
   request: NextRequest,
   context: RouteContext
@@ -205,6 +213,8 @@ export async function DELETE(
 
     await connectToDatabase();
 
+    // Ownership protection:
+    // only the owner can delete this notification.
     const notification = await Notification.findOneAndDelete({
       _id: id,
       user: user._id,

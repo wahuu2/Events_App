@@ -1,6 +1,6 @@
-import mongoose, { Schema, models } from "mongoose";
+import mongoose, { Schema, model, models } from "mongoose";
 
-const notificationSchema = new Schema(
+const NotificationSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -15,6 +15,7 @@ const notificationSchema = new Schema(
         "booking_confirmed",
         "payment_successful",
         "ticket_generated",
+        "new_booking",
         "event_updated",
         "event_cancelled",
         "event_reminder",
@@ -36,14 +37,19 @@ const notificationSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
-    timestamps: true,
+    timestamps: false,
   }
 );
 
 const Notification =
   models.Notification ||
-  mongoose.model("Notification", notificationSchema);
+  model("Notification", NotificationSchema);
 
 export default Notification;

@@ -6,30 +6,35 @@ import Booking from "@/database/booking.model";
 
 export async function GET() {
   try {
+    // 1. Authenticate the current user.
     const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json(
         {
           success: false,
-          message: "Unauthorized",
+          message: "You must be signed in.",
         },
         { status: 401 }
       );
     }
 
+    // 2. Only organizers can access organizer bookings.
     if (user.role !== "organizer") {
       return NextResponse.json(
         {
           success: false,
-          message: "Only organizers can view event bookings",
+          message: "Only organizers can view event bookings.",
         },
         { status: 403 }
       );
     }
 
+    // 3. Connect to the database.
     await connectToDatabase();
 
+    // 4. Retrieve bookings and only populate events
+    //    belonging to the authenticated organizer.
     const bookings = await Booking.find()
       .populate({
         path: "event",
@@ -46,8 +51,8 @@ export async function GET() {
       .sort({ createdAt: -1 })
       .lean();
 
-    // Because populate(match) can leave event as null,
-    // remove bookings that don't belong to this organizer.
+    // 5. Remove bookings whose event did not belong
+    //    to the authenticated organizer.
     const organizerBookings = bookings.filter(
       (booking) => booking.event !== null
     );
@@ -57,15 +62,14 @@ export async function GET() {
       bookings: organizerBookings,
     });
   } catch (error) {
-    console.error(
-      "Organizer bookings error:",
-      error
-    );
+    // Detailed error remains server-side only.
+    console.error("Organizer bookings error:", error);
 
+    // Never expose database/internal error details.
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to fetch organizer bookings",
+        message: "Failed to fetch organizer bookings.",
       },
       { status: 500 }
     );

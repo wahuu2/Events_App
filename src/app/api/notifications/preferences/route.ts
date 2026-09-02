@@ -4,8 +4,35 @@ import { connectToDatabase } from "@/database";
 import NotificationPreference from "@/database/notification-preference.model";
 import { getCurrentUser } from "@/lib/auth";
 
-export async function GET(request: NextRequest) {
+const ALLOWED_FIELDS = [
+  "bookingConfirmed",
+  "paymentSuccessful",
+  "ticketGenerated",
+  "eventUpdated",
+  "eventCancelled",
+  "eventReminder",
+] as const;
+
+type PreferenceField = (typeof ALLOWED_FIELDS)[number];
+
+function formatPreferences(preferences: any) {
+  return {
+    bookingConfirmed: preferences.bookingConfirmed,
+    paymentSuccessful: preferences.paymentSuccessful,
+    ticketGenerated: preferences.ticketGenerated,
+    eventUpdated: preferences.eventUpdated,
+    eventCancelled: preferences.eventCancelled,
+    eventReminder: preferences.eventReminder,
+  };
+}
+
+/**
+ * GET — Get notification preferences for the
+ * currently authenticated user.
+ */
+export async function GET() {
   try {
+    // 1. Authenticate the current user.
     const user = await getCurrentUser();
 
     if (!user) {
@@ -18,32 +45,30 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 2. Connect to the database.
     await connectToDatabase();
 
+    // 3. Only retrieve preferences belonging to this user.
     let preferences = await NotificationPreference.findOne({
       user: user._id,
     }).lean();
 
+    // 4. Create default preferences if none exist.
     if (!preferences) {
       preferences = await NotificationPreference.create({
         user: user._id,
       });
     }
 
+    // 5. Return only allowed preference fields.
     return NextResponse.json({
       success: true,
-      preferences: {
-        bookingConfirmed: preferences.bookingConfirmed,
-        paymentSuccessful: preferences.paymentSuccessful,
-        ticketGenerated: preferences.ticketGenerated,
-        eventUpdated: preferences.eventUpdated,
-        eventCancelled: preferences.eventCancelled,
-        eventReminder: preferences.eventReminder,
-      },
+      preferences: formatPreferences(preferences),
     });
   } catch (error) {
     console.error("Get notification preferences error:", error);
 
+    // Do not expose internal errors.
     return NextResponse.json(
       {
         success: false,
@@ -54,8 +79,13 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/**
+ * PATCH — Update notification preferences for the
+ * currently authenticated user.
+ */
 export async function PATCH(request: NextRequest) {
   try {
+    // 1. Authenticate the current user.
     const user = await getCurrentUser();
 
     if (!user) {
@@ -68,22 +98,46 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    // 2. Parse the request body safely.
+    let body: unknown;
 
-    const allowedFields = [
-      "bookingConfirmed",
-      "paymentSuccessful",
-      "ticketGenerated",
-      "eventUpdated",
-      "eventCancelled",
-      "eventReminder",
-    ];
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid JSON request body.",
+        },
+        { status: 400 }
+      );
+    }
 
-    const updates: Record<string, boolean> = {};
+    // 3. Make sure the body is a JSON object.
+    if (
+      typeof body !== "object" ||
+      body === null ||
+      Array.isArray(body)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Request body must be a valid object.",
+        },
+        { status: 400 }
+      );
+    }
 
-    for (const field of allowedFields) {
-      if (field in body) {
-        if (typeof body[field] !== "boolean") {
+    const requestBody = body as Record<string, unknown>;
+
+    // 4. Only allow known preference fields.
+    const updates: Partial<Record<PreferenceField, boolean>> = {};
+
+    for (const field of ALLOWED_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(requestBody, field)) {
+        const value = requestBody[field];
+
+        if (typeof value !== "boolean") {
           return NextResponse.json(
             {
               success: false,
@@ -93,10 +147,11 @@ export async function PATCH(request: NextRequest) {
           );
         }
 
-        updates[field] = body[field];
+        updates[field] = value;
       }
     }
 
+    // 5. Reject requests that contain no valid preference fields.
     if (Object.keys(updates).length === 0) {
       return NextResponse.json(
         {
@@ -107,8 +162,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // 6. Connect to the database.
     await connectToDatabase();
 
+    // 7. Update only the authenticated user's preferences.
     const preferences =
       await NotificationPreference.findOneAndUpdate(
         {
@@ -121,25 +178,29 @@ export async function PATCH(request: NextRequest) {
           new: true,
           upsert: true,
           setDefaultsOnInsert: true,
-          lean: true,
         }
-      );
+      ).lean();
 
+    if (!preferences) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Failed to update notification preferences.",
+        },
+        { status: 500 }
+      );
+    }
+
+    // 8. Return the updated preferences.
     return NextResponse.json({
       success: true,
       message: "Notification preferences updated successfully.",
-      preferences: {
-        bookingConfirmed: preferences.bookingConfirmed,
-        paymentSuccessful: preferences.paymentSuccessful,
-        ticketGenerated: preferences.ticketGenerated,
-        eventUpdated: preferences.eventUpdated,
-        eventCancelled: preferences.eventCancelled,
-        eventReminder: preferences.eventReminder,
-      },
+      preferences: formatPreferences(preferences),
     });
   } catch (error) {
     console.error("Update notification preferences error:", error);
 
+    // Do not expose internal database errors.
     return NextResponse.json(
       {
         success: false,

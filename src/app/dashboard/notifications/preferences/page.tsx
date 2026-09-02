@@ -92,7 +92,8 @@ export default function NotificationPreferencesPage() {
 
       if (!response.ok || !data.success) {
         throw new Error(
-          data.message || "Failed to fetch notification preferences."
+          data.message ||
+            "Failed to fetch notification preferences."
         );
       }
 
@@ -185,53 +186,59 @@ export default function NotificationPreferencesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <div className="mb-8">
+    <div className="mx-auto w-full max-w-3xl">
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
         <div className="flex items-center gap-3">
-          <BellIcon className="h-7 w-7 text-gray-300" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card">
+            <BellIcon className="h-5 w-5 text-accent" />
+          </div>
 
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
             Notification Preferences
           </h1>
         </div>
 
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-foreground-secondary">
           Choose which notifications you want to receive.
         </p>
       </div>
 
+      {/* Success message */}
       {message && (
-        <div className="mb-6 flex items-center gap-2 rounded-xl border border-green-500/20 bg-green-500/10 p-4">
-          <CheckIcon className="h-5 w-5 text-green-400" />
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-green-500/20 bg-green-500/10 p-4">
+          <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-green-400" />
 
-          <p className="text-sm text-green-400">
+          <p className="text-sm leading-6 text-green-400">
             {message}
           </p>
         </div>
       )}
 
+      {/* Error */}
       {error && (
         <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
-          <p className="text-sm text-red-400">
+          <p className="text-sm leading-6 text-red-400">
             {error}
           </p>
 
           <button
             type="button"
             onClick={fetchPreferences}
-            className="mt-2 text-sm text-gray-300 underline hover:text-white"
+            className="mt-2 text-sm font-medium text-foreground-secondary underline transition hover:text-white"
           >
             Try again
           </button>
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900">
+      {/* Preferences */}
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         {loading ? (
-          <div className="px-6 py-16 text-center">
-            <ArrowPathIcon className="mx-auto h-7 w-7 animate-spin text-gray-600" />
+          <div className="px-5 py-16 text-center sm:px-6">
+            <ArrowPathIcon className="mx-auto h-7 w-7 animate-spin text-foreground-muted" />
 
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="mt-4 text-sm text-foreground-muted">
               Loading preferences...
             </p>
           </div>
@@ -244,14 +251,14 @@ export default function NotificationPreferencesPage() {
               return (
                 <div
                   key={item.key}
-                  className="flex items-center justify-between gap-6 border-b border-gray-800 p-5 last:border-b-0"
+                  className="flex items-start justify-between gap-4 border-b border-border p-4 last:border-b-0 sm:items-center sm:gap-6 sm:p-5"
                 >
-                  <div className="min-w-0">
-                    <h2 className="text-sm font-semibold text-white">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="break-words text-sm font-semibold text-white">
                       {item.title}
                     </h2>
 
-                    <p className="mt-1 text-sm leading-5 text-gray-500">
+                    <p className="mt-1 text-sm leading-6 text-foreground-muted">
                       {item.description}
                     </p>
                   </div>
@@ -265,10 +272,11 @@ export default function NotificationPreferencesPage() {
                     aria-label={`${
                       enabled ? "Disable" : "Enable"
                     } ${item.title}`}
-                    className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+                    aria-pressed={enabled}
+                    className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition focus:outline-none focus:ring-2 focus:ring-accent/50 ${
                       enabled
-                        ? "bg-white"
-                        : "bg-gray-700"
+                        ? "bg-accent"
+                        : "bg-border-hover"
                     } ${
                       saving
                         ? "cursor-not-allowed opacity-50"
@@ -276,10 +284,10 @@ export default function NotificationPreferencesPage() {
                     }`}
                   >
                     <span
-                      className={`absolute top-1 h-4 w-4 rounded-full transition ${
+                      className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition ${
                         enabled
-                          ? "left-6 bg-black"
-                          : "left-1 bg-gray-400"
+                          ? "left-6"
+                          : "left-1"
                       }`}
                     />
                   </button>
@@ -290,17 +298,20 @@ export default function NotificationPreferencesPage() {
         )}
       </div>
 
-      <div className="mt-6 rounded-xl border border-gray-800 bg-gray-900 p-5">
+      {/* Information */}
+      <div className="mt-6 rounded-xl border border-border bg-card p-4 sm:p-5">
         <h2 className="text-sm font-semibold text-white">
           Notification settings
         </h2>
 
-        <p className="mt-2 text-sm leading-6 text-gray-500">
+        <p className="mt-2 text-sm leading-6 text-foreground-muted">
           These preferences control the notification types
           available for your EventApp account. Turning a setting
           off does not delete existing notifications.
         </p>
       </div>
+
+      <div className="h-8" />
     </div>
   );
 }

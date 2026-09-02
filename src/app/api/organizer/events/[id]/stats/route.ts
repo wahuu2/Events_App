@@ -19,69 +19,79 @@ export async function GET(
   context: RouteContext
 ) {
   try {
+    // 1. Get the event ID.
     const { id } = await context.params;
 
+    // 2. Validate the MongoDB ObjectId.
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid event ID",
+          message: "Invalid event ID.",
         },
         { status: 400 }
       );
     }
 
+    // 3. Authenticate the user.
     const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json(
         {
           success: false,
-          message: "Unauthorized",
+          message: "You must be signed in.",
         },
         { status: 401 }
       );
     }
 
+    // 4. Only organizers can access analytics.
     if (user.role !== "organizer") {
       return NextResponse.json(
         {
           success: false,
-          message: "Only organizers can view event analytics",
+          message: "Only organizers can view event analytics.",
         },
         { status: 403 }
       );
     }
 
+    // 5. Connect to the database.
     await connectToDatabase();
 
+    // 6. Find the requested event.
     const event = await Event.findById(id).lean();
 
     if (!event) {
       return NextResponse.json(
         {
           success: false,
-          message: "Event not found",
+          message: "Event not found.",
         },
         { status: 404 }
       );
     }
 
+    // 7. Verify that this organizer owns the event.
     if (event.organizer.toString() !== user._id.toString()) {
       return NextResponse.json(
         {
           success: false,
           message:
-            "You can only view analytics for your own events",
+            "You can only view analytics for your own events.",
         },
         { status: 403 }
       );
     }
 
+    // 8. Get confirmed bookings for this event.
     const bookings = await Booking.find({
       event: event._id,
       status: "confirmed",
-    }).lean();
+    })
+      .select("quantity totalAmount")
+      .lean();
 
     const totalBookings = bookings.length;
 
@@ -100,9 +110,12 @@ export async function GET(
       0
     );
 
+    // 9. Get tickets for this event.
     const tickets = await Ticket.find({
       event: event._id,
-    }).lean();
+    })
+      .select("status")
+      .lean();
 
     const ticketsCheckedIn = tickets.filter(
       (ticket) => ticket.status === "used"
@@ -116,9 +129,9 @@ export async function GET(
       (ticket) => ticket.status === "cancelled"
     ).length;
 
+    // 10. Return analytics.
     return NextResponse.json({
       success: true,
-
       analytics: {
         event: {
           id: event._id,
@@ -143,12 +156,14 @@ export async function GET(
       },
     });
   } catch (error) {
+    // Detailed error stays on the server.
     console.error("Event analytics error:", error);
 
+    // Generic error returned to the client.
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to fetch event analytics",
+        message: "Failed to fetch event analytics.",
       },
       { status: 500 }
     );
