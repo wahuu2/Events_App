@@ -32,8 +32,10 @@ export default function MyBookingsPage() {
   useEffect(() => {
     async function fetchBookings() {
       try {
-        const response = await fetch("/api/bookings");
+        setLoading(true);
+        setError("");
 
+        const response = await fetch("/api/bookings");
         const data = await response.json();
 
         if (!response.ok || !data.success) {
@@ -61,118 +63,342 @@ export default function MyBookingsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <p className="text-gray-400">
-            Loading your bookings...
-          </p>
-        </div>
+      <main className="min-h-screen bg-background text-foreground">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+          <div className="animate-pulse space-y-8">
+            <div>
+              <div className="h-4 w-24 rounded bg-card" />
+              <div className="mt-4 h-10 w-56 rounded bg-card" />
+              <div className="mt-3 h-4 w-80 rounded bg-card" />
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {[1, 2, 3, 4].map((item) => (
+                <div
+                  key={item}
+                  className="overflow-hidden rounded-2xl border border-border bg-card"
+                >
+                  <div className="h-56 bg-background-secondary" />
+
+                  <div className="space-y-4 p-6">
+                    <div className="h-4 w-24 rounded bg-background-secondary" />
+                    <div className="h-7 w-2/3 rounded bg-background-secondary" />
+                    <div className="h-16 rounded bg-background-secondary" />
+                    <div className="h-20 rounded bg-background-secondary" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
     );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h1 className="text-3xl font-bold">
-            Unable to load bookings
-          </h1>
+      <main className="min-h-screen bg-background text-foreground">
+        <section className="mx-auto flex min-h-[70vh] max-w-7xl items-center justify-center px-6 py-12 lg:px-8">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-8 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-xl font-bold text-red-400">
+              !
+            </div>
 
-          <p className="mt-3 text-gray-400">
-            {error}
-          </p>
-        </div>
+            <h1 className="mt-5 text-2xl font-bold">
+              Unable to load bookings
+            </h1>
+
+            <p className="mt-3 text-sm leading-6 text-foreground-secondary">
+              {error}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-6 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover"
+            >
+              Try Again
+            </button>
+          </div>
+        </section>
       </main>
     );
   }
 
- return (
-  <main className="min-h-screen bg-gray-950 text-gray-100">
-       {/* Page Content */}
-    <section className="mx-auto max-w-6xl px-6 py-12">
-      <div>
-        <p className="text-sm uppercase tracking-[0.3em] text-gray-400">Dashboard</p>
-        <h1 className="mt-3 text-4xl font-bold text-white">My Bookings</h1>
-        <p className="mt-3 text-gray-400">View and manage the events you have booked.</p>
-      </div>
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+        {/* Header */}
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
 
-      {bookings.length === 0 ? (
-        <div className="mt-10 rounded-2xl border border-gray-800 bg-gray-900 p-10 text-center">
-          <h2 className="text-2xl font-semibold text-white">No bookings yet</h2>
-          <p className="mt-3 text-gray-400">You haven't booked any events yet.</p>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+              Dashboard
+            </p>
+
+            <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+              My Bookings
+            </h1>
+
+            <p className="mt-2 max-w-xl text-sm text-foreground-secondary md:text-base">
+              View and manage the events you have booked.
+            </p>
+          </div>
+
           <Link
             href="/events"
-            className="mt-6 inline-block rounded-lg bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200"
+            className="inline-flex w-fit rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover"
           >
             Discover Events
           </Link>
         </div>
-      ) : (
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          {bookings.map((booking) => (
-            <div
-              key={booking._id}
-              className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 hover:border-gray-600 transition"
-            >
-              <img
-                src={booking.event.image}
-                alt={booking.event.title}
-                className="h-56 w-full object-cover"
-              />
 
-              <div className="p-6">
-                <p className="text-sm text-gray-400">{booking.event.category}</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">{booking.event.title}</h2>
+        {/* Summary */}
+        {bookings.length > 0 && (
+          <div className="mt-8 grid gap-5 sm:grid-cols-3">
+            <SummaryCard
+              label="Total Bookings"
+              value={bookings.length.toString()}
+              description="Events you've booked"
+            />
 
-                <div className="mt-5 space-y-2 text-sm text-gray-300">
-                  <p>📍 {booking.event.location}</p>
-                  <p>
-                    📅{" "}
-                    {new Date(booking.event.date).toLocaleDateString("en-KE")}
-                  </p>
-                  <p>⏰ {booking.event.time}</p>
-                </div>
+            <SummaryCard
+              label="Tickets"
+              value={bookings
+                .reduce((total, booking) => total + booking.quantity, 0)
+                .toString()}
+              description="Tickets across bookings"
+            />
 
-                <div className="mt-6 border-t border-gray-800 pt-5">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Tickets</span>
-                    <span>{booking.quantity}</span>
-                  </div>
+            <SummaryCard
+              label="Confirmed"
+              value={bookings
+                .filter(
+                  (booking) =>
+                    booking.status.toLowerCase() === "confirmed"
+                )
+                .length.toString()}
+              description="Confirmed bookings"
+            />
+          </div>
+        )}
 
-                  <div className="mt-2 flex justify-between">
-                    <span className="text-gray-400">Total</span>
-                    <span className="font-semibold text-white">
-                      {booking.totalAmount === 0
-                        ? "Free"
-                        : `KES ${booking.totalAmount.toLocaleString()}`}
-                    </span>
-                  </div>
-
-                  <div className="mt-2 flex justify-between">
-                    <span className="text-gray-400">Status</span>
-                    <span className="capitalize text-white">{booking.status}</span>
-                  </div>
-                </div>
-
-                <p className="mt-5 text-xs text-gray-500">
-                  Booking reference: {booking.bookingReference}
-                </p>
-
-                <Link
-                  href={`/dashboard/bookings/${booking._id}`}
-                  className="mt-5 block w-full rounded-lg border border-gray-700 px-5 py-3 text-center font-medium hover:bg-gray-800 transition text-white"
-                >
-                  View Booking
-                </Link>
-              </div>
+        {/* Empty State */}
+        {bookings.length === 0 ? (
+          <div className="mt-10 rounded-2xl border border-border bg-card px-6 py-16 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+              <span className="text-xl font-bold">E</span>
             </div>
-          ))}
-        </div>
-      )}
-    </section>
-  </main>
-);
 
+            <h2 className="mt-6 text-2xl font-semibold">
+              No bookings yet
+            </h2>
 
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-foreground-secondary">
+              You haven't booked any events yet. Explore upcoming events
+              and find something worth experiencing.
+            </p>
+
+            <Link
+              href="/events"
+              className="mt-6 inline-flex rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover"
+            >
+              Discover Events
+            </Link>
+          </div>
+        ) : (
+          /* Booking Cards */
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            {bookings.map((booking) => {
+              const eventDate = new Date(
+                booking.event.date
+              ).toLocaleDateString("en-KE", {
+                weekday: "short",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              });
+
+              return (
+                <article
+                  key={booking._id}
+                  className="group overflow-hidden rounded-2xl border border-border bg-card transition duration-200 hover:border-border-hover"
+                >
+                  {/* Event Image */}
+                  <div className="relative">
+                    <img
+                      src={booking.event.image}
+                      alt={booking.event.title}
+                      className="h-56 w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                    />
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+                    <span className="absolute left-5 top-5 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur">
+                      {booking.event.category}
+                    </span>
+
+                    <div className="absolute bottom-5 right-5">
+                      <StatusBadge status={booking.status} />
+                    </div>
+                  </div>
+
+                  {/* Booking Information */}
+                  <div className="p-6">
+                    <h2 className="text-xl font-semibold tracking-tight">
+                      {booking.event.title}
+                    </h2>
+
+                    {/* Event Details */}
+                    <div className="mt-5 space-y-3">
+                      <InfoRow
+                        label="Location"
+                        value={booking.event.location}
+                      />
+
+                      <InfoRow
+                        label="Date"
+                        value={eventDate}
+                      />
+
+                      <InfoRow
+                        label="Time"
+                        value={booking.event.time}
+                      />
+                    </div>
+
+                    {/* Booking Summary */}
+                    <div className="mt-6 rounded-xl border border-border bg-background-secondary/50 p-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-foreground-secondary">
+                          Tickets
+                        </span>
+
+                        <span className="text-sm font-semibold">
+                          {booking.quantity}
+                        </span>
+                      </div>
+
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className="text-sm text-foreground-secondary">
+                          Total
+                        </span>
+
+                        <span className="font-semibold">
+                          {booking.totalAmount === 0
+                            ? "Free"
+                            : `KES ${booking.totalAmount.toLocaleString()}`}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Booking Reference */}
+                    <div className="mt-5">
+                      <p className="text-xs uppercase tracking-wider text-foreground-muted">
+                        Booking Reference
+                      </p>
+
+                      <p className="mt-1 font-mono text-sm text-foreground-secondary">
+                        {booking.bookingReference}
+                      </p>
+                    </div>
+
+                    {/* Action */}
+                    <Link
+                      href={`/dashboard/bookings/${booking._id}`}
+                      className="mt-6 flex w-full items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover"
+                    >
+                      View Booking
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Footer */}
+        <footer className="mt-12 border-t border-border pt-6 text-center text-xs text-foreground-muted">
+          EventApp · Your bookings and event experiences
+        </footer>
+      </section>
+    </main>
+  );
+}
+
+/* ---------------------------------
+   Summary Card
+---------------------------------- */
+
+function SummaryCard({
+  label,
+  value,
+  description,
+}: {
+  label: string;
+  value: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-6 transition hover:border-border-hover">
+      <p className="text-sm font-medium text-foreground-secondary">
+        {label}
+      </p>
+
+      <p className="mt-3 text-3xl font-bold tracking-tight">
+        {value}
+      </p>
+
+      <p className="mt-2 text-xs text-foreground-muted">
+        {description}
+      </p>
+    </div>
+  );
+}
+
+/* ---------------------------------
+   Event Information Row
+---------------------------------- */
+
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-6 text-sm">
+      <span className="text-foreground-muted">
+        {label}
+      </span>
+
+      <span className="text-right text-foreground-secondary">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+/* ---------------------------------
+   Booking Status Badge
+---------------------------------- */
+
+function StatusBadge({ status }: { status: string }) {
+  const normalizedStatus = status.toLowerCase();
+
+  const styles =
+    normalizedStatus === "confirmed"
+      ? "border-green-500/20 bg-green-500/10 text-green-400"
+      : normalizedStatus === "pending"
+        ? "border-yellow-500/20 bg-yellow-500/10 text-yellow-400"
+        : "border-red-500/20 bg-red-500/10 text-red-400";
+
+  return (
+    <span
+      className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold capitalize backdrop-blur ${styles}`}
+    >
+      {status}
+    </span>
+  );
 }
