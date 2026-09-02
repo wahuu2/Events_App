@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 type Event = {
   _id: string;
@@ -20,18 +20,19 @@ export default function OrganizerEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
+
   async function fetchEvents() {
     try {
       setLoading(true);
       setError("");
 
       const response = await fetch("/api/organizer/events");
-
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to fetch events");
+        throw new Error(
+          data.message || "Failed to fetch events."
+        );
       }
 
       setEvents(data.events);
@@ -41,7 +42,7 @@ export default function OrganizerEventsPage() {
       setError(
         error instanceof Error
           ? error.message
-          : "Failed to load your events"
+          : "Failed to load your events."
       );
     } finally {
       setLoading(false);
@@ -69,7 +70,9 @@ export default function OrganizerEventsPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to delete event");
+        throw new Error(
+          data.message || "Failed to delete event."
+        );
       }
 
       setEvents((currentEvents) =>
@@ -81,16 +84,38 @@ export default function OrganizerEventsPage() {
       alert(
         error instanceof Error
           ? error.message
-          : "Failed to delete event"
+          : "Failed to delete event."
       );
     }
   }
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <p className="text-gray-400">Loading your events...</p>
+      <main className="min-h-screen bg-background text-foreground">
+        <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
+          <div className="animate-pulse">
+            <div className="h-4 w-32 rounded bg-card" />
+            <div className="mt-4 h-10 w-56 rounded bg-card" />
+            <div className="mt-3 h-5 w-80 max-w-full rounded bg-card" />
+
+            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="overflow-hidden rounded-xl border border-border bg-card"
+                >
+                  <div className="h-52 bg-background-secondary" />
+
+                  <div className="space-y-3 p-5">
+                    <div className="h-4 w-24 rounded bg-background-secondary" />
+                    <div className="h-6 w-3/4 rounded bg-background-secondary" />
+                    <div className="h-4 w-1/2 rounded bg-background-secondary" />
+                    <div className="h-4 w-2/3 rounded bg-background-secondary" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </main>
     );
@@ -98,15 +123,25 @@ export default function OrganizerEventsPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <h1 className="text-3xl font-bold">My Events</h1>
+      <main className="min-h-screen bg-background text-foreground">
+        <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent">
+            Organizer Workspace
+          </p>
 
-          <p className="mt-4 text-red-400">{error}</p>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight">
+            My Events
+          </h1>
+
+          <div className="mt-8 rounded-xl border border-red-900/60 bg-red-950/30 p-6">
+            <p className="text-sm font-medium text-red-400">
+              {error}
+            </p>
+          </div>
 
           <Link
             href="/dashboard"
-            className="mt-6 inline-block rounded-lg bg-white px-5 py-3 font-semibold text-black"
+            className="mt-6 inline-flex rounded-lg border border-border px-5 py-2.5 text-sm font-semibold transition hover:border-border-hover hover:bg-card"
           >
             Back to Dashboard
           </Link>
@@ -116,131 +151,200 @@ export default function OrganizerEventsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-     
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        <div className="mb-10">
-          <p className="text-sm uppercase tracking-[0.3em] text-gray-400">
-            Organizer
-          </p>
-
-          <div className="mt-3 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
+        {/* Header */}
+        <section>
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h1 className="text-4xl font-bold">
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent">
+                Organizer Workspace
+              </p>
+
+              <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
                 My Events
               </h1>
 
-              <p className="mt-3 text-gray-400">
-                Create and manage the events you organize.
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-foreground-secondary sm:text-base">
+                Create, manage, and monitor the events you organize.
               </p>
             </div>
 
             <Link
               href="/dashboard/events/create"
-              className="rounded-lg bg-white px-5 py-3 text-center font-semibold text-black hover:bg-gray-200"
+              className="inline-flex w-fit items-center justify-center rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-hover"
             >
               + Create Event
             </Link>
           </div>
+        </section>
+
+        {/* Event count */}
+        <div className="mt-8 flex items-center justify-between border-b border-border pb-5">
+          <div>
+            <p className="text-sm text-foreground-secondary">
+              Your events
+            </p>
+
+            <p className="mt-1 text-2xl font-bold">
+              {events.length}
+            </p>
+          </div>
+
+          <Link
+            href="/events"
+            className="text-sm font-medium text-foreground-secondary transition hover:text-white"
+          >
+            View public events →
+          </Link>
         </div>
 
+        {/* Empty state */}
         {events.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-700 bg-gray-900 p-12 text-center">
-            <h2 className="text-2xl font-semibold">
+          <div className="mt-8 rounded-2xl border border-dashed border-border-hover bg-card px-6 py-16 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-xl font-bold text-accent">
+              +
+            </div>
+
+            <h2 className="mt-5 text-2xl font-semibold">
               No events yet
             </h2>
 
-            <p className="mt-3 text-gray-400">
-              Create your first event and start getting people
-              interested.
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-foreground-secondary">
+              Create your first event and start managing registrations,
+              attendees, and ticket sales.
             </p>
 
             <Link
               href="/dashboard/events/create"
-              className="mt-6 inline-block rounded-lg bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200"
+              className="mt-7 inline-flex rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-hover"
             >
               Create Your First Event
             </Link>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          /* Event grid */
+          <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
-              <div
+              <article
                 key={event._id}
-                className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-900"
+                className="group overflow-hidden rounded-xl border border-border bg-card transition hover:border-border-hover"
               >
-                <img
-                  src={event.image}
-                  alt={event.title}
-                  className="h-52 w-full object-cover"
-                />
+                {/* Image */}
+                <div className="relative h-52 overflow-hidden bg-background-secondary">
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                  />
 
-                <div className="p-5">
-                  <p className="text-sm text-gray-400">
+                  <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur">
                     {event.category}
-                  </p>
+                  </div>
+                </div>
 
-                  <h2 className="mt-2 text-xl font-semibold">
+                {/* Content */}
+                <div className="p-5">
+                  <h2 className="line-clamp-2 text-xl font-semibold tracking-tight">
                     {event.title}
                   </h2>
 
-                  <p className="mt-2 text-sm text-gray-400">
-                    {event.location}
-                  </p>
+                  <div className="mt-4 space-y-2 text-sm text-foreground-secondary">
+                    <p className="flex items-start gap-2">
+                      <span className="text-foreground-muted">
+                        Location
+                      </span>
+                      <span className="truncate">
+                        {event.location}
+                      </span>
+                    </p>
 
-                  <p className="mt-1 text-sm text-gray-400">
-                    {new Date(event.date).toLocaleDateString(
-                      "en-KE",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
-                    {" · "}
-                    {event.time}
-                  </p>
+                    <p className="flex items-start gap-2">
+                      <span className="text-foreground-muted">
+                        Date
+                      </span>
+                      <span>
+                        {new Date(event.date).toLocaleDateString(
+                          "en-KE",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
+                      </span>
+                    </p>
 
-                  <div className="mt-4 flex justify-between border-t border-gray-800 pt-4">
-                    <span className="font-semibold">
-                      {event.price === 0
-                        ? "Free"
-                        : `KES ${event.price.toLocaleString()}`}
-                    </span>
-
-                    <span className="text-sm text-gray-400">
-                      Capacity: {event.capacity}
-                    </span>
+                    <p className="flex items-start gap-2">
+                      <span className="text-foreground-muted">
+                        Time
+                      </span>
+                      <span>{event.time}</span>
+                    </p>
                   </div>
 
+                  {/* Event summary */}
+                  <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
+                    <div>
+                      <p className="text-xs text-foreground-muted">
+                        Ticket price
+                      </p>
+
+                      <p className="mt-1 font-semibold">
+                        {event.price === 0
+                          ? "Free"
+                          : `KES ${event.price.toLocaleString()}`}
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-xs text-foreground-muted">
+                        Capacity
+                      </p>
+
+                      <p className="mt-1 font-semibold">
+                        {event.capacity.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
                   <div className="mt-5 grid grid-cols-3 gap-2">
                     <Link
-  href={`/dashboard/events/${event._id}`}
-  className="rounded-lg border border-gray-700 px-3 py-2 text-center text-sm hover:bg-gray-800"
->
-  Analytics
-</Link>
+                      href={`/dashboard/events/${event._id}`}
+                      className="rounded-lg border border-border px-3 py-2 text-center text-xs font-medium transition hover:border-border-hover hover:bg-background-secondary sm:text-sm"
+                    >
+                      Analytics
+                    </Link>
 
                     <Link
                       href={`/dashboard/events/${event._id}/edit`}
-                      className="rounded-lg border border-gray-700 px-3 py-2 text-center text-sm hover:bg-gray-800"
+                      className="rounded-lg border border-border px-3 py-2 text-center text-xs font-medium transition hover:border-border-hover hover:bg-background-secondary sm:text-sm"
                     >
                       Edit
                     </Link>
 
                     <button
+                      type="button"
                       onClick={() => deleteEvent(event._id)}
-                      className="rounded-lg border border-red-900 px-3 py-2 text-sm text-red-400 hover:bg-red-950"
+                      className="rounded-lg border border-red-900/70 px-3 py-2 text-xs font-medium text-red-400 transition hover:bg-red-950/40 sm:text-sm"
                     >
                       Delete
                     </button>
                   </div>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         )}
-      </section>
+
+        {/* Footer */}
+        <footer className="mt-14 border-t border-border pt-6">
+          <p className="text-center text-xs text-foreground-muted">
+            EventApp Organizer Workspace
+          </p>
+        </footer>
+      </div>
     </main>
   );
 }
