@@ -33,16 +33,19 @@ type Ticket = {
 
 export default function BookingDetailsPage() {
   const params = useParams();
-
   const id = params.id as string;
 
- const [booking, setBooking] = useState<Booking | null>(null);
-const [ticket, setTicket] = useState<Ticket | null>(null);
-const [loading, setLoading] = useState(true);
-const [ticketLoading, setTicketLoading] = useState(false);
-const [error, setError] = useState("");
-const [ticketError, setTicketError] = useState("");
-const [ticketExists, setTicketExists] = useState(false);
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [ticketLoading, setTicketLoading] = useState(false);
+
+  const [error, setError] = useState("");
+  const [ticketError, setTicketError] = useState("");
+
+  const [ticketExists, setTicketExists] = useState(false);
+
   useEffect(() => {
     async function fetchBooking() {
       try {
@@ -50,7 +53,6 @@ const [ticketExists, setTicketExists] = useState(false);
         setError("");
 
         const response = await fetch(`/api/bookings/${id}`);
-
         const data = await response.json();
 
         if (!response.ok || !data.success) {
@@ -108,7 +110,7 @@ const [ticketExists, setTicketExists] = useState(false);
       }
 
       setTicket(data.tickets[0]);
-setTicketExists(data.alreadyExists === true);
+      setTicketExists(data.alreadyExists === true);
     } catch (error) {
       console.error("Generate ticket error:", error);
 
@@ -124,119 +126,165 @@ setTicketExists(data.alreadyExists === true);
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
-        <div className="mx-auto max-w-5xl px-6 py-20">
-          <p className="text-gray-400">
-            Loading booking...
-          </p>
-        </div>
+      <main className="min-h-screen bg-background text-foreground">
+        <section className="mx-auto max-w-5xl px-6 py-10 lg:px-8">
+          <div className="animate-pulse space-y-8">
+            <div className="h-4 w-32 rounded bg-card" />
+
+            <div className="overflow-hidden rounded-2xl border border-border bg-card">
+              <div className="h-72 bg-background-secondary md:h-96" />
+
+              <div className="space-y-4 p-6 md:p-8">
+                <div className="h-4 w-24 rounded bg-background-secondary" />
+                <div className="h-9 w-2/3 rounded bg-background-secondary" />
+                <div className="h-5 w-1/2 rounded bg-background-secondary" />
+              </div>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="h-64 rounded-2xl border border-border bg-card" />
+              <div className="h-64 rounded-2xl border border-border bg-card" />
+            </div>
+          </div>
+        </section>
       </main>
     );
   }
 
   if (error || !booking) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
-        <div className="mx-auto max-w-5xl px-6 py-20">
-          <h1 className="text-3xl font-bold">
-            Booking not found
-          </h1>
+      <main className="min-h-screen bg-background text-foreground">
+        <section className="mx-auto flex min-h-[70vh] max-w-5xl items-center justify-center px-6 py-12">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-8 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-xl font-bold text-red-400">
+              !
+            </div>
 
-          <p className="mt-3 text-gray-400">
-            {error ||
-              "The booking you are looking for does not exist."}
-          </p>
+            <h1 className="mt-5 text-2xl font-bold">
+              Booking not found
+            </h1>
 
-          <Link
-            href="/dashboard/bookings"
-            className="mt-6 inline-block rounded-lg bg-white px-5 py-3 font-semibold text-black hover:bg-gray-200"
-          >
-            Back to My Bookings
-          </Link>
-        </div>
+            <p className="mt-3 text-sm leading-6 text-foreground-secondary">
+              {error ||
+                "The booking you are looking for does not exist."}
+            </p>
+
+            <Link
+              href="/dashboard/bookings"
+              className="mt-6 inline-flex rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover"
+            >
+              Back to My Bookings
+            </Link>
+          </div>
+        </section>
       </main>
     );
   }
 
   const eventDate = new Date(booking.event.date);
 
-  const formattedDate = eventDate.toLocaleDateString(
-    "en-KE",
-    {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }
-  );
+  const formattedDate = eventDate.toLocaleDateString("en-KE", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const bookedDate = new Date(
+    booking.createdAt
+  ).toLocaleDateString("en-KE", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      
+    <main className="min-h-screen bg-background text-foreground">
+      <section className="mx-auto max-w-5xl px-6 py-10 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Link
+            href="/dashboard/bookings"
+            className="text-sm font-medium text-foreground-secondary transition hover:text-white"
+          >
+            ← Back to My Bookings
+          </Link>
 
-      <section className="mx-auto max-w-5xl px-6 py-12">
-       
-        {/* Booking header */}
-        <div className="mt-8 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">
-          <img
-            src={booking.event.image}
-            alt={booking.event.title}
-            className="h-72 w-full object-cover md:h-96"
-          />
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+            Booking Details
+          </p>
 
-          <div className="p-6 md:p-8">
-            <p className="text-sm uppercase tracking-widest text-gray-400">
-              {booking.event.category}
-            </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+            Your Event Booking
+          </h1>
 
-            <h1 className="mt-3 text-3xl font-bold md:text-4xl">
-              {booking.event.title}
-            </h1>
+          <p className="mt-2 text-sm text-foreground-secondary">
+            Review your booking, payment status, and digital ticket.
+          </p>
+        </div>
 
-            <div className="mt-6 space-y-3 text-gray-300">
-              <p>📍 {booking.event.location}</p>
+        {/* Event Header */}
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="relative">
+            <img
+              src={booking.event.image}
+              alt={booking.event.title}
+              className="h-72 w-full object-cover md:h-96"
+            />
 
-              <p>📅 {formattedDate}</p>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-              <p>⏰ {booking.event.time}</p>
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+              <span className="inline-flex rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
+                {booking.event.category}
+              </span>
+
+              <h2 className="mt-4 text-3xl font-bold text-white md:text-4xl">
+                {booking.event.title}
+              </h2>
+
+              <div className="mt-4 space-y-2 text-sm text-gray-200 md:text-base">
+                <p>{booking.event.location}</p>
+                <p>
+                  {formattedDate} · {booking.event.time}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Booking information */}
+        {/* Booking Information */}
         <div className="mt-8 grid gap-6 md:grid-cols-2">
-          {/* Ticket information */}
-          <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
-            <h2 className="text-xl font-semibold">
-              Booking Information
-            </h2>
+          {/* Booking Summary */}
+          <section className="rounded-2xl border border-border bg-card p-6 md:p-7">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                Order Summary
+              </p>
+
+              <h2 className="mt-2 text-xl font-semibold">
+                Booking Information
+              </h2>
+            </div>
 
             <div className="mt-6 space-y-4">
-              <div className="flex justify-between">
-                <span className="text-gray-400">
-                  Tickets
-                </span>
+              <InfoRow
+                label="Tickets"
+                value={booking.quantity.toString()}
+              />
 
-                <span className="font-medium">
-                  {booking.quantity}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-gray-400">
-                  Ticket price
-                </span>
-
-                <span>
-                  {booking.event.price === 0
+              <InfoRow
+                label="Ticket price"
+                value={
+                  booking.event.price === 0
                     ? "Free"
-                    : `KES ${booking.event.price.toLocaleString()}`}
-                </span>
-              </div>
+                    : `KES ${booking.event.price.toLocaleString()}`
+                }
+              />
 
-              <div className="border-t border-gray-800 pt-4">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">
+              <div className="border-t border-border pt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-foreground-secondary">
                     Total
                   </span>
 
@@ -248,139 +296,206 @@ setTicketExists(data.alreadyExists === true);
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* Status */}
-          <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
-            <h2 className="text-xl font-semibold">
-              Booking Status
-            </h2>
-
-            <div className="mt-6">
-              <p className="text-sm text-gray-400">
-                Status
+          {/* Booking Status */}
+          <section className="rounded-2xl border border-border bg-card p-6 md:p-7">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                Booking Status
               </p>
 
-              <p className="mt-2 text-lg font-semibold capitalize">
-                {booking.status}
-              </p>
+              <h2 className="mt-2 text-xl font-semibold">
+                Booking Information
+              </h2>
             </div>
 
             <div className="mt-6">
-              <p className="text-sm text-gray-400">
-                Booking Reference
-              </p>
-
-              <p className="mt-2 break-all font-mono text-sm">
-                {booking.bookingReference}
-              </p>
+              <StatusBadge status={booking.status} />
             </div>
 
-            <div className="mt-6">
-              <p className="text-sm text-gray-400">
-                Booked on
-              </p>
+            <div className="mt-6 space-y-5">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-foreground-muted">
+                  Booking Reference
+                </p>
 
-              <p className="mt-2">
-                {new Date(
-                  booking.createdAt
-                ).toLocaleDateString("en-KE")}
-              </p>
+                <p className="mt-2 break-all font-mono text-sm text-foreground-secondary">
+                  {booking.bookingReference}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-foreground-muted">
+                  Booked On
+                </p>
+
+                <p className="mt-2 text-sm text-foreground-secondary">
+                  {bookedDate}
+                </p>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
 
-        {/* Ticket generation */}
+        {/* Digital Ticket */}
         {booking.status === "confirmed" && (
-          <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
-            <h2 className="text-xl font-semibold">
-              Digital Ticket
-            </h2>
+          <section className="mt-8 rounded-2xl border border-border bg-card p-6 md:p-8">
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                Entry Pass
+              </p>
 
-            <p className="mt-2 text-gray-400">
-              Your booking is confirmed. Generate your digital
-              ticket to attend the event.
-            </p>
+              <h2 className="text-xl font-semibold">
+                Digital Ticket
+              </h2>
+
+              <p className="text-sm leading-6 text-foreground-secondary">
+                Your booking is confirmed. Generate your digital ticket
+                to attend the event.
+              </p>
+            </div>
 
             {ticketError && (
-              <div className="mt-4 rounded-lg border border-red-800 bg-red-950 p-4 text-sm text-red-300">
+              <div className="mt-5 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
                 {ticketError}
               </div>
             )}
 
             {!ticket ? (
               <button
+                type="button"
                 onClick={generateTicket}
                 disabled={ticketLoading}
-                className="mt-6 rounded-lg bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-6 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {ticketLoading
                   ? "Generating Ticket..."
-                  : "Generate Ticket"}
+                  : "Generate Digital Ticket"}
               </button>
             ) : (
-              <div className="mt-6 rounded-xl border border-green-800 bg-green-950 p-5">
-                <p className="text-sm text-green-400">
-  ✓{" "}
-  {ticketExists
-    ? "You already have a ticket for this booking."
-    : "Ticket generated successfully."}
-</p>
+              <div className="mt-6 rounded-xl border border-green-500/20 bg-green-500/10 p-5">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-500/15 text-sm font-bold text-green-400">
+                    ✓
+                  </div>
 
-                <p className="mt-3 text-sm text-gray-400">
-                  Ticket Number
-                </p>
+                  <div>
+                    <p className="text-sm font-semibold text-green-400">
+                      {ticketExists
+                        ? "You already have a ticket for this booking."
+                        : "Ticket generated successfully."}
+                    </p>
 
-                <p className="mt-1 font-mono text-lg font-bold">
-                  {ticket.ticketNumber}
-                </p>
+                    <p className="mt-4 text-xs uppercase tracking-wider text-foreground-muted">
+                      Ticket Number
+                    </p>
 
-                <p className="mt-3 text-sm">
-                  Status:{" "}
-                  <span className="font-semibold capitalize text-green-400">
-                    {ticket.status}
-                  </span>
-                </p>
+                    <p className="mt-1 font-mono text-lg font-bold">
+                      {ticket.ticketNumber}
+                    </p>
+
+                    <p className="mt-4 text-sm text-foreground-secondary">
+                      Status:{" "}
+                      <span className="font-semibold capitalize text-green-400">
+                        {ticket.status}
+                      </span>
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
-          </div>
+          </section>
         )}
 
-       {/* Actions */}
-<div className="mt-8 flex flex-wrap gap-4">
-  {booking.status === "pending" && booking.totalAmount > 0 && (
-    <Link
-      href={`/dashboard/bookings/${booking._id}/payment`}
-      className="rounded-lg bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
-    >
-      Pay Now
-    </Link>
-  )}
+        {/* Actions */}
+        <div className="mt-8 flex flex-wrap gap-3">
+          {booking.status === "pending" &&
+            booking.totalAmount > 0 && (
+              <Link
+                href={`/dashboard/bookings/${booking._id}/payment`}
+                className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover"
+              >
+                Pay Now
+              </Link>
+            )}
 
-  {booking.status === "confirmed" && (
-    <Link
-      href={`/dashboard/bookings/${booking._id}/ticket`}
-      className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
-    >
-      View Ticket
-    </Link>
-  )}
+          {booking.status === "confirmed" && (
+            <Link
+              href={`/dashboard/bookings/${booking._id}/ticket`}
+              className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover"
+            >
+              View Ticket
+            </Link>
+          )}
 
-  <Link
-    href={`/events/${booking.event._id}`}
-    className="rounded-lg bg-white px-6 py-3 font-semibold text-black hover:bg-gray-200"
-  >
-    View Event
-  </Link>
+          <Link
+            href={`/events/${booking.event._id}`}
+            className="rounded-lg border border-border-hover px-6 py-3 text-sm font-semibold transition hover:bg-card"
+          >
+            View Event
+          </Link>
 
-  <Link
-    href="/dashboard/bookings"
-    className="rounded-lg border border-gray-700 px-6 py-3 font-semibold hover:bg-gray-800"
-  >
-    All My Bookings
-  </Link>
-</div>
+          <Link
+            href="/dashboard/bookings"
+            className="rounded-lg border border-border-hover px-6 py-3 text-sm font-semibold transition hover:bg-card"
+          >
+            All My Bookings
+          </Link>
+        </div>
+
+        {/* Footer */}
+        <footer className="mt-12 border-t border-border pt-6 text-center text-xs text-foreground-muted">
+          EventApp · Booking Details
+        </footer>
       </section>
     </main>
+  );
+}
+
+/* ---------------------------------
+   Information Row
+---------------------------------- */
+
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-6">
+      <span className="text-sm text-foreground-secondary">
+        {label}
+      </span>
+
+      <span className="text-right text-sm font-medium">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+/* ---------------------------------
+   Status Badge
+---------------------------------- */
+
+function StatusBadge({ status }: { status: string }) {
+  const normalizedStatus = status.toLowerCase();
+
+  const styles =
+    normalizedStatus === "confirmed"
+      ? "border-green-500/20 bg-green-500/10 text-green-400"
+      : normalizedStatus === "pending"
+        ? "border-yellow-500/20 bg-yellow-500/10 text-yellow-400"
+        : "border-red-500/20 bg-red-500/10 text-red-400";
+
+  return (
+    <span
+      className={`inline-flex rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${styles}`}
+    >
+      {status}
+    </span>
   );
 }
