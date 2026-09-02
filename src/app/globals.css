@@ -1,23 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  /* Backgrounds */
   --background: #09090b;
   --background-secondary: #111113;
   --card: #18181b;
 
-  /* Borders */
   --border: #27272a;
   --border-hover: #3f3f46;
 
-  /* Text */
   --foreground: #fafafa;
   --foreground-secondary: #a1a1aa;
   --foreground-muted: #71717a;
 
-  /* Brand */
---accent: #3b82f6;
---accent-hover: #2563eb;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
 }
 
 @theme inline {
@@ -39,12 +35,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* -------------------------------- */
+/* Base                             */
+/* -------------------------------- */
+
 * {
   box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -53,17 +54,162 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Selection */
 ::selection {
   background: var(--accent);
   color: #ffffff;
 }
 
-/* Scrollbar */
+/* -------------------------------- */
+/* Responsive Media                 */
+/* -------------------------------- */
+
+img,
+video,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+img {
+  display: block;
+  height: auto;
+}
+
+/* -------------------------------- */
+/* Forms                            */
+/* -------------------------------- */
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  max-width: 100%;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Prevent long text from breaking layouts */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  overflow-wrap: break-word;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: break-word;
+}
+
+/* -------------------------------- */
+/* Tables                           */
+/* -------------------------------- */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  max-width: 100%;
+}
+
+/* -------------------------------- */
+/* Mobile Container                 */
+/* -------------------------------- */
+
+.container-responsive {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-inline: 2rem;
+  }
+}
+
+/* -------------------------------- */
+/* Responsive Text                  */
+/* -------------------------------- */
+
+.text-responsive-xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+@media (min-width: 768px) {
+  .text-responsive-xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+/* -------------------------------- */
+/* Mobile Buttons                   */
+/* -------------------------------- */
+
+.button-responsive {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .button-responsive {
+    width: auto;
+  }
+}
+
+/* -------------------------------- */
+/* Responsive Cards                 */
+/* -------------------------------- */
+
+.card-responsive {
+  width: 100%;
+  min-width: 0;
+}
+
+/* -------------------------------- */
+/* Prevent Flex/Grid Overflow       */
+/* -------------------------------- */
+
+.flex > *,
+.grid > * {
+  min-width: 0;
+}
+
+/* -------------------------------- */
+/* Scrollbar                        */
+/* -------------------------------- */
+
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -79,26 +225,39 @@ body {
   background: #52525b;
 }
 
-/* Form elements */
-button,
-input,
-textarea,
-select {
-  font: inherit;
+/* -------------------------------- */
+/* Small Screen Improvements        */
+/* -------------------------------- */
+
+@media (max-width: 639px) {
+  input,
+  textarea,
+  select {
+    width: 100%;
+  }
+
+  button {
+    max-width: 100%;
+  }
 }
 
-button {
-  cursor: pointer;
-}
+/* -------------------------------- */
+/* Print                            */
+/* -------------------------------- */
 
-/* Links */
-a {
-  color: inherit;
-  text-decoration: none;
-}
+@media print {
+  html,
+  body {
+    background: #ffffff;
+    color: #000000;
+    overflow: visible;
+  }
 
-/* Images */
-img {
-  max-width: 100%;
-  display: block;
+  .print-hidden {
+    display: none !important;
+  }
+
+  .ticket-card {
+    break-inside: avoid;
+  }
 }
