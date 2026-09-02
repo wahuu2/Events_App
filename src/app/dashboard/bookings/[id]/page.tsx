@@ -203,12 +203,7 @@ export default function BookingDetailsPage() {
       <section className="mx-auto max-w-5xl px-6 py-10 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <Link
-            href="/dashboard/bookings"
-            className="text-sm font-medium text-foreground-secondary transition hover:text-white"
-          >
-            ← Back to My Bookings
-          </Link>
+          
 
           <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
             Booking Details

@@ -22,6 +22,74 @@ type Booking = {
   };
 };
 
+function InfoItem({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wider text-foreground-muted">
+        {label}
+      </p>
+
+      <p className="mt-1.5 text-sm font-medium text-foreground">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function PaymentMethod({
+  title,
+  description,
+  selected,
+  onClick,
+}: {
+  title: string;
+  description: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative rounded-xl border p-5 text-left transition ${
+        selected
+          ? "border-accent bg-accent/10"
+          : "border-border bg-background-secondary hover:border-border-hover"
+      }`}
+    >
+      {selected && (
+        <span className="absolute right-4 top-4 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">
+          ✓
+        </span>
+      )}
+
+      <div
+        className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold ${
+          selected
+            ? "bg-accent text-white"
+            : "bg-card text-foreground-secondary"
+        }`}
+      >
+        {title === "M-Pesa" ? "M" : "C"}
+      </div>
+
+      <p className="mt-4 font-semibold text-foreground">
+        {title}
+      </p>
+
+      <p className="mt-1 text-sm text-foreground-secondary">
+        {description}
+      </p>
+    </button>
+  );
+}
+
 export default function PaymentPage() {
   const params = useParams();
   const router = useRouter();
@@ -71,90 +139,107 @@ export default function PaymentPage() {
   }, [bookingId]);
 
   async function handlePayment() {
-  if (!booking) return;
+    if (!booking) return;
 
-  setPaying(true);
-  setError("");
-  setSuccess("");
+    setPaying(true);
+    setError("");
+    setSuccess("");
 
-  try {
-    // Step 1: Create the payment
-    const createResponse = await fetch("/api/payments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        bookingId: booking._id,
-        method,
-      }),
-    });
+    try {
+      // Step 1: Create the payment
+      const createResponse = await fetch("/api/payments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookingId: booking._id,
+          method,
+        }),
+      });
 
-    const createData = await createResponse.json();
+      const createData = await createResponse.json();
 
-    if (!createResponse.ok || !createData.success) {
-      throw new Error(
-        createData.message || "Failed to create payment"
+      if (!createResponse.ok || !createData.success) {
+        throw new Error(
+          createData.message || "Failed to create payment"
+        );
+      }
+
+      const createdPaymentId = createData.payment.id;
+
+      setPaymentId(createdPaymentId);
+
+      // Simulate a short payment-processing delay
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1500)
       );
-    }
 
-    const createdPaymentId = createData.payment.id;
+      // Step 2: Simulate successful payment
+      const processResponse = await fetch("/api/payments", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          paymentId: createdPaymentId,
+          action: "success",
+        }),
+      });
 
-    setPaymentId(createdPaymentId);
+      const processData = await processResponse.json();
 
-    // Simulate a short payment-processing delay
-    await new Promise((resolve) =>
-      setTimeout(resolve, 1500)
-    );
+      if (!processResponse.ok || !processData.success) {
+        throw new Error(
+          processData.message || "Payment failed"
+        );
+      }
 
-    // Step 2: Simulate successful payment
-    const processResponse = await fetch("/api/payments", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        paymentId: createdPaymentId,
-        action: "success",
-      }),
-    });
-
-    const processData = await processResponse.json();
-
-    if (!processResponse.ok || !processData.success) {
-      throw new Error(
-        processData.message || "Payment failed"
+      setSuccess(
+        "Payment successful. Your booking has been confirmed."
       );
+
+      setTimeout(() => {
+        router.push(`/dashboard/bookings/${booking._id}`);
+      }, 2000);
+    } catch (error) {
+      console.error("Payment error:", error);
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Payment failed"
+      );
+    } finally {
+      setPaying(false);
     }
-
-    setSuccess(
-      "Payment successful! Your booking has been confirmed."
-    );
-
-    // Give the user a moment to see the success message
-    setTimeout(() => {
-      router.push(`/dashboard/bookings/${booking._id}`);
-    }, 2000);
-  } catch (error) {
-    console.error("Payment error:", error);
-
-    setError(
-      error instanceof Error
-        ? error.message
-        : "Payment failed"
-    );
-  } finally {
-    setPaying(false);
   }
-}
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
-        <div className="mx-auto max-w-4xl px-6 py-20">
-          <p className="text-gray-400">
-            Loading payment...
-          </p>
+      <main className="min-h-screen bg-background text-foreground">
+        <div className="mx-auto max-w-5xl px-6 py-12">
+          <div className="animate-pulse space-y-6">
+            <div className="h-4 w-24 rounded bg-card" />
+            <div className="h-10 w-72 rounded bg-card" />
+            <div className="h-5 w-96 max-w-full rounded bg-card" />
+
+            <div className="overflow-hidden rounded-2xl border border-border bg-card">
+              <div className="h-64 bg-background-secondary" />
+
+              <div className="space-y-6 p-8">
+                <div className="h-4 w-24 rounded bg-background-secondary" />
+                <div className="h-8 w-80 rounded bg-background-secondary" />
+
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="h-12 rounded bg-background-secondary" />
+                  <div className="h-12 rounded bg-background-secondary" />
+                  <div className="h-12 rounded bg-background-secondary" />
+                  <div className="h-12 rounded bg-background-secondary" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     );
@@ -162,22 +247,28 @@ export default function PaymentPage() {
 
   if (error && !booking) {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
-        <div className="mx-auto max-w-4xl px-6 py-20">
-          <h1 className="text-3xl font-bold">
-            Unable to load payment
-          </h1>
+      <main className="min-h-screen bg-background text-foreground">
+        <div className="mx-auto flex min-h-screen max-w-4xl items-center justify-center px-6 py-20">
+          <div className="w-full rounded-2xl border border-border bg-card p-8 text-center sm:p-12">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-400">
+              !
+            </div>
 
-          <p className="mt-3 text-gray-400">
-            {error}
-          </p>
+            <h1 className="mt-5 text-2xl font-bold">
+              Unable to load payment
+            </h1>
 
-          <Link
-            href="/dashboard/bookings"
-            className="mt-6 inline-block rounded-lg bg-white px-5 py-3 font-semibold text-black"
-          >
-            Back to bookings
-          </Link>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-foreground-secondary">
+              {error}
+            </p>
+
+            <Link
+              href="/dashboard/bookings"
+              className="mt-7 inline-flex rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover"
+            >
+              Back to Bookings
+            </Link>
+          </div>
         </div>
       </main>
     );
@@ -189,186 +280,211 @@ export default function PaymentPage() {
 
   if (booking.status === "confirmed") {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
-        <div className="mx-auto max-w-4xl px-6 py-20 text-center">
-          <h1 className="text-3xl font-bold">
-            Booking Already Confirmed
-          </h1>
+      <main className="min-h-screen bg-background text-foreground">
+        <div className="mx-auto flex min-h-screen max-w-4xl items-center justify-center px-6 py-20">
+          <div className="w-full rounded-2xl border border-border bg-card p-8 text-center sm:p-12">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 text-xl font-bold text-accent">
+              ✓
+            </div>
 
-          <p className="mt-3 text-gray-400">
-            This booking has already been paid for.
-          </p>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.25em] text-accent">
+              Payment Complete
+            </p>
 
-          <Link
-            href={`/dashboard/bookings/${booking._id}`}
-            className="mt-6 inline-block rounded-lg bg-white px-6 py-3 font-semibold text-black"
-          >
-            View Booking
-          </Link>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight">
+              Booking Already Confirmed
+            </h1>
+
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-foreground-secondary">
+              This booking has already been paid for and
+              confirmed.
+            </p>
+
+            <Link
+              href={`/dashboard/bookings/${booking._id}`}
+              className="mt-7 inline-flex rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover"
+            >
+              View Booking
+            </Link>
+          </div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      <nav className="border-b border-gray-800">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+    <main className="min-h-screen bg-background text-foreground">
+      <nav className="border-b border-border bg-background">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
           <Link
             href="/"
-            className="text-xl font-bold"
+            className="flex items-center gap-3"
           >
-            EventApp
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-sm font-bold text-white">
+              E
+            </div>
+
+            <span className="text-xl font-bold tracking-tight">
+              EventApp
+            </span>
           </Link>
 
           <Link
             href="/dashboard/bookings"
-            className="rounded-lg border border-gray-700 px-4 py-2 text-sm hover:bg-gray-800"
+            className="rounded-lg border border-border-hover px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card"
           >
             My Bookings
           </Link>
         </div>
       </nav>
 
-      <section className="mx-auto max-w-4xl px-6 py-12">
-        <p className="text-sm uppercase tracking-[0.3em] text-gray-500">
-          Checkout
-        </p>
+      <section className="mx-auto max-w-5xl px-6 py-12 lg:py-16">
+        <div className="max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">
+            Checkout
+          </p>
 
-        <h1 className="mt-3 text-4xl font-bold">
-          Complete Payment
-        </h1>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            Complete Payment
+          </h1>
 
-        <p className="mt-3 text-gray-400">
-          Complete your payment to confirm your booking.
-        </p>
+          <p className="mt-3 text-sm leading-6 text-foreground-secondary sm:text-base">
+            Choose your preferred payment method to confirm
+            your event booking.
+          </p>
+        </div>
 
-        <div className="mt-10 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">
-          <img
-            src={booking.event.image}
-            alt={booking.event.title}
-            className="h-64 w-full object-cover"
-          />
+        <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-black/10">
+          <div className="relative h-64 overflow-hidden sm:h-80">
+            <img
+              src={booking.event.image}
+              alt={booking.event.title}
+              className="h-full w-full object-cover"
+            />
 
-          <div className="p-8">
-            <p className="text-sm text-gray-500">
-              {booking.event.category}
-            </p>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-            <h2 className="mt-2 text-3xl font-bold">
-              {booking.event.title}
-            </h2>
+            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+              <span className="inline-flex rounded-full border border-white/20 bg-black/40 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+                {booking.event.category}
+              </span>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <h2 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
+                {booking.event.title}
+              </h2>
+            </div>
+          </div>
+
+          <div className="p-6 sm:p-8">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <InfoItem
+                label="Location"
+                value={booking.event.location}
+              />
+
+              <InfoItem
+                label="Date"
+                value={new Date(
+                  booking.event.date
+                ).toLocaleDateString("en-KE", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              />
+
+              <InfoItem
+                label="Time"
+                value={booking.event.time}
+              />
+
+              <InfoItem
+                label="Tickets"
+                value={`${booking.quantity} ${
+                  booking.quantity === 1
+                    ? "ticket"
+                    : "tickets"
+                }`}
+              />
+
+              <InfoItem
+                label="Booking Reference"
+                value={booking.bookingReference}
+              />
+            </div>
+
+            <div className="my-8 border-t border-border" />
+
+            <div>
               <div>
-                <p className="text-sm text-gray-500">
-                  Location
-                </p>
+                <h3 className="text-lg font-semibold">
+                  Payment Method
+                </h3>
 
-                <p className="mt-1">
-                  {booking.event.location}
+                <p className="mt-1 text-sm text-foreground-secondary">
+                  Select how you would like to complete this
+                  payment.
                 </p>
               </div>
 
-              <div>
-                <p className="text-sm text-gray-500">
-                  Date
-                </p>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <PaymentMethod
+                  title="M-Pesa"
+                  description="Pay using M-Pesa"
+                  selected={method === "mpesa"}
+                  onClick={() => setMethod("mpesa")}
+                />
 
-                <p className="mt-1">
-                  {new Date(
-                    booking.event.date
-                  ).toLocaleDateString("en-KE")}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">
-                  Tickets
-                </p>
-
-                <p className="mt-1">
-                  {booking.quantity}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">
-                  Booking Reference
-                </p>
-
-                <p className="mt-1">
-                  {booking.bookingReference}
-                </p>
+                <PaymentMethod
+                  title="Card"
+                  description="Pay using a debit or credit card"
+                  selected={method === "card"}
+                  onClick={() => setMethod("card")}
+                />
               </div>
             </div>
 
-            <div className="my-8 border-t border-gray-800" />
+            <div className="mt-8 rounded-xl border border-border bg-background-secondary p-5 sm:p-6">
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <p className="text-sm text-foreground-secondary">
+                    Amount to pay
+                  </p>
 
-            <h3 className="text-xl font-semibold">
-              Payment Method
-            </h3>
+                  <p className="mt-1 text-xs text-foreground-muted">
+                    {booking.quantity}{" "}
+                    {booking.quantity === 1
+                      ? "ticket"
+                      : "tickets"}
+                  </p>
+                </div>
 
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => setMethod("mpesa")}
-                className={`rounded-xl border p-5 text-left transition ${
-                  method === "mpesa"
-                    ? "border-white bg-gray-800"
-                    : "border-gray-700 hover:border-gray-500"
-                }`}
-              >
-                <p className="font-semibold">
-                  M-Pesa
-                </p>
-
-                <p className="mt-1 text-sm text-gray-400">
-                  Pay using M-Pesa
-                </p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setMethod("card")}
-                className={`rounded-xl border p-5 text-left transition ${
-                  method === "card"
-                    ? "border-white bg-gray-800"
-                    : "border-gray-700 hover:border-gray-500"
-                }`}
-              >
-                <p className="font-semibold">
-                  Card
-                </p>
-
-                <p className="mt-1 text-sm text-gray-400">
-                  Pay using a card
-                </p>
-              </button>
-            </div>
-
-            <div className="mt-8 rounded-xl bg-gray-950 p-6">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400">
-                  Total
-                </span>
-
-                <span className="text-2xl font-bold">
+                <p className="text-2xl font-bold tracking-tight sm:text-3xl">
                   KES{" "}
                   {booking.totalAmount.toLocaleString()}
-                </span>
+                </p>
               </div>
             </div>
 
             {error && (
-              <div className="mt-5 rounded-lg border border-red-900 bg-red-950/40 p-4 text-sm text-red-300">
-                {error}
+              <div className="mt-5 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
+                <p className="text-sm font-medium text-red-400">
+                  {error}
+                </p>
               </div>
             )}
 
             {success && (
-              <div className="mt-5 rounded-lg border border-green-900 bg-green-950/40 p-4 text-sm text-green-300">
-                {success}
+              <div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+                <p className="text-sm font-medium text-emerald-400">
+                  {success}
+                </p>
+
+                {paymentId && (
+                  <p className="mt-1 text-xs text-emerald-400/70">
+                    Payment processed successfully.
+                  </p>
+                )}
               </div>
             )}
 
@@ -376,15 +492,40 @@ export default function PaymentPage() {
               type="button"
               onClick={handlePayment}
               disabled={paying}
-              className="mt-6 w-full rounded-xl bg-white px-6 py-4 font-semibold text-black transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-6 flex w-full items-center justify-center rounded-xl bg-accent px-6 py-4 text-sm font-semibold text-white transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {paying
-                ? "Creating Payment..."
-                : `Pay KES ${booking.totalAmount.toLocaleString()}`}
+              {paying ? (
+                <span className="flex items-center gap-3">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  Processing Payment...
+                </span>
+              ) : (
+                `Pay KES ${booking.totalAmount.toLocaleString()}`
+              )}
             </button>
+
+            <p className="mt-4 text-center text-xs leading-5 text-foreground-muted">
+              This is a development payment flow. No real
+              payment will be charged.
+            </p>
           </div>
         </div>
+
+        <div className="mt-6 flex justify-center">
+          <Link
+            href={`/dashboard/bookings/${booking._id}`}
+            className="text-sm text-foreground-secondary transition hover:text-foreground"
+          >
+            ← Return to booking
+          </Link>
+        </div>
       </section>
+
+      <footer className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-8 text-center text-xs text-foreground-muted">
+          EventApp — Discover. Connect. Experience.
+        </div>
+      </footer>
     </main>
   );
 }

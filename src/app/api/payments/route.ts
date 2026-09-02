@@ -395,15 +395,18 @@ export async function PATCH(request: NextRequest) {
         status: ticket.status,
       })),
     });
-  } catch (error) {
-    console.error("Process payment error:", error);
+} catch (error) {
+  console.error("Process payment error:", error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to process payment.",
-      },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to process payment.",
+    },
+    { status: 500 }
+  );
+}
 }

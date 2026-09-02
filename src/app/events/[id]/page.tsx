@@ -204,12 +204,12 @@ export default function EventDetailsPage() {
       {/* Header */}
       <header className="border-b border-border">
         <div className="mx-auto max-w-7xl px-6 py-5 lg:px-8">
-          <Link
-            href="/events"
-            className="inline-flex items-center gap-2 text-sm font-medium text-foreground-secondary transition hover:text-white"
-          >
-            ← Back to Events
-          </Link>
+         <Link
+              href="/dashboard"
+              className="transition hover:text-white"
+            >
+              Dashboard
+            </Link>
         </div>
       </header>
 
