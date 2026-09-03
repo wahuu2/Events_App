@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/lib/auth";
 import Notification from "@/database/notification.model";
@@ -8,7 +7,7 @@ export default async function AdminNotificationsPage() {
   const result = await requireAdmin();
 
   if (!result.authorized) {
-    redirect("/dashboard");
+    return null;
   }
 
   const notifications = await Notification.find({})
@@ -16,223 +15,296 @@ export default async function AdminNotificationsPage() {
     .sort({ createdAt: -1 })
     .lean();
 
-  const readNotifications = notifications.filter(
-    (notification) => notification.read
-  ).length;
+  const totalNotifications = notifications.length;
 
   const unreadNotifications = notifications.filter(
     (notification) => !notification.read
   ).length;
 
-  const notificationTypes = new Set(
-    notifications.map((notification) => notification.type)
+  const readNotifications = notifications.filter(
+    (notification) => notification.read
+  ).length;
+
+  const uniqueUsers = new Set(
+    notifications
+      .map((notification) =>
+        notification.user?._id
+          ? notification.user._id.toString()
+          : null
+      )
+      .filter(Boolean)
   ).size;
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="container-responsive py-8">
-        {/* Header */}
-        <div className="mb-8">
-         
-          <div className="mt-6">
-            <p className="text-sm font-medium uppercase tracking-wider text-accent">
-              Administration
-            </p>
+    <div className="min-h-screen bg-background">
+      {/* PAGE HEADER */}
+      <section className="border-b border-border">
+        <div className="container-responsive py-8 sm:py-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
 
-            <h1 className="mt-2 text-3xl font-bold md:text-4xl">
-              Notification Management
-            </h1>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">
+                Platform Management
+              </p>
 
-            <p className="mt-2 max-w-2xl text-foreground-secondary">
-              Monitor notification activity and system-generated messages
-              across the Eventora platform.
-            </p>
+              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+                Notifications
+              </h1>
+
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground-secondary">
+                Monitor system notifications, user activity, and
+                important communication generated across Eventora.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-card px-5 py-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
+                Total Notifications
+              </p>
+
+              <p className="mt-1 text-2xl font-black">
+                {totalNotifications}
+              </p>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Statistics */}
-        <section className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Total */}
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <p className="text-sm text-foreground-secondary">
-              Total Notifications
-            </p>
+      {/* STAT CARDS */}
+      <section className="container-responsive py-6">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            label="Total"
+            value={totalNotifications}
+            description="All system notifications"
+            accent
+          />
 
-            <p className="mt-2 text-3xl font-bold">
-              {notifications.length}
-            </p>
+          <StatCard
+            label="Unread"
+            value={unreadNotifications}
+            description="Awaiting user attention"
+          />
 
-            <p className="mt-2 text-xs text-foreground-muted">
-              All platform notifications
-            </p>
-          </div>
+          <StatCard
+            label="Read"
+            value={readNotifications}
+            description="Already viewed"
+          />
 
-          {/* Unread */}
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <p className="text-sm text-foreground-secondary">
-              Unread
-            </p>
+          <StatCard
+            label="Users Reached"
+            value={uniqueUsers}
+            description="Unique recipients"
+          />
+        </div>
+      </section>
 
-            <p className="mt-2 text-3xl font-bold">
-              {unreadNotifications}
-            </p>
-
-            <p className="mt-2 text-xs text-foreground-muted">
-              Awaiting user attention
-            </p>
-          </div>
-
-          {/* Read */}
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <p className="text-sm text-foreground-secondary">
-              Read
-            </p>
-
-            <p className="mt-2 text-3xl font-bold">
-              {readNotifications}
-            </p>
-
-            <p className="mt-2 text-xs text-foreground-muted">
-              Already viewed
-            </p>
-          </div>
-
-          {/* Types */}
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <p className="text-sm text-foreground-secondary">
-              Notification Types
-            </p>
-
-            <p className="mt-2 text-3xl font-bold">
-              {notificationTypes}
-            </p>
-
-            <p className="mt-2 text-xs text-foreground-muted">
-              Active notification categories
-            </p>
-          </div>
-        </section>
-
-        {/* Notification Table */}
+      {/* NOTIFICATION ACTIVITY */}
+      <section className="container-responsive pb-10">
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="border-b border-border px-6 py-4">
-            <h2 className="font-semibold">
-              Platform Notification Activity
-            </h2>
+          <div className="flex flex-col gap-3 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-base font-bold">
+                System Activity
+              </h2>
+
+              <p className="mt-1 text-xs text-foreground-muted">
+                Latest notifications appear first.
+              </p>
+            </div>
+
+            <span className="w-fit rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground-secondary">
+              {totalNotifications} notifications
+            </span>
           </div>
 
-          <div className="table-wrapper">
-            <table className="w-full min-w-[1100px] text-left">
-              <thead className="border-b border-border bg-background-secondary">
-                <tr>
-                  <th className="px-6 py-4 text-sm font-medium">
-                    Notification
-                  </th>
+          {notifications.length === 0 ? (
+            <div className="px-6 py-16 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background text-lg text-foreground-muted">
+                ◉
+              </div>
 
-                  <th className="px-6 py-4 text-sm font-medium">
-                    User
-                  </th>
+              <h3 className="mt-4 text-sm font-bold">
+                No notifications found
+              </h3>
 
-                  <th className="px-6 py-4 text-sm font-medium">
-                    Type
-                  </th>
+              <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-foreground-muted">
+                No system notifications have been generated yet.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {notifications.map((notification) => {
+                const user = notification.user as
+                  | {
+                      _id?: string;
+                      firstName?: string;
+                      lastName?: string;
+                      email?: string;
+                    }
+                  | null;
 
-                  <th className="px-6 py-4 text-sm font-medium">
-                    Message
-                  </th>
+                const userName =
+                  `${user?.firstName || ""} ${
+                    user?.lastName || ""
+                  }`.trim() || "Unknown User";
 
-                  <th className="px-6 py-4 text-sm font-medium">
-                    Status
-                  </th>
-
-                  <th className="px-6 py-4 text-sm font-medium">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {notifications.map((notification) => (
-                  <tr
+                return (
+                  <div
                     key={notification._id.toString()}
-                    className="border-b border-border last:border-b-0"
+                    className="group px-5 py-5 transition hover:bg-background-secondary/60"
                   >
-                    {/* Notification */}
-                    <td className="px-6 py-4">
-                      <div className="font-medium">
-                        {notification.title}
-                      </div>
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      {/* MAIN CONTENT */}
+                      <div className="flex min-w-0 gap-4">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-accent/20 bg-accent/10 text-sm font-black text-accent">
+                          ◉
+                        </div>
 
-                      <div className="mt-1 text-xs text-foreground-muted">
-                        ID: {notification._id.toString()}
-                      </div>
-                    </td>
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-sm font-bold">
+                              {notification.title}
+                            </h3>
 
-                    {/* User */}
-                    <td className="px-6 py-4">
-                      {notification.user ? (
-                        <>
-                          <div className="text-sm font-medium">
-                            {notification.user.firstName}{" "}
-                            {notification.user.lastName}
+                            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-foreground-muted">
+                              {formatNotificationType(
+                                notification.type
+                              )}
+                            </span>
                           </div>
 
-                          <div className="mt-1 text-xs text-foreground-muted">
-                            {notification.user.email}
+                          <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground-secondary">
+                            {notification.message}
+                          </p>
+
+                          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                            <span className="text-xs font-semibold text-foreground">
+                              {userName}
+                            </span>
+
+                            <span className="text-xs text-foreground-muted">
+                              {user?.email || "No email"}
+                            </span>
+
+                            <span className="text-xs text-foreground-muted">
+                              {formatDate(
+                                notification.createdAt
+                              )}
+                            </span>
                           </div>
-                        </>
-                      ) : (
-                        "Unknown user"
-                      )}
-                    </td>
+                        </div>
+                      </div>
 
-                    {/* Type */}
-                    <td className="px-6 py-4">
-                      <span className="rounded-full border border-border px-3 py-1 text-xs font-medium">
-                        {notification.type.replaceAll("_", " ")}
-                      </span>
-                    </td>
-
-                    {/* Message */}
-                    <td className="max-w-md px-6 py-4 text-sm text-foreground-secondary">
-                      <p className="line-clamp-2">
-                        {notification.message}
-                      </p>
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-6 py-4">
-                      <span className="rounded-full border border-border px-3 py-1 text-xs font-medium">
-                        {notification.read ? "Read" : "Unread"}
-                      </span>
-                    </td>
-
-                    {/* Date */}
-                    <td className="px-6 py-4 text-sm text-foreground-secondary">
-                      {notification.createdAt
-                        ? new Date(
-                            notification.createdAt
-                          ).toLocaleDateString()
-                        : "—"}
-                    </td>
-                  </tr>
-                ))}
-
-                {notifications.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-6 py-10 text-center text-foreground-secondary"
-                    >
-                      No notifications found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                      {/* STATUS */}
+                      <div className="shrink-0 lg:pt-1">
+                        <ReadStatus
+                          read={notification.read}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-      </div>
-    </main>
+      </section>
+    </div>
   );
+}
+
+/* -------------------------------- */
+/* STAT CARD */
+/* -------------------------------- */
+
+function StatCard({
+  label,
+  value,
+  description,
+  accent = false,
+}: {
+  label: string;
+  value: number;
+  description: string;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-2xl border p-5 transition ${
+        accent
+          ? "border-accent/30 bg-accent/10"
+          : "border-border bg-card hover:border-border-hover"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-foreground-muted">
+          {label}
+        </p>
+
+        <span
+          className={`h-2 w-2 rounded-full ${
+            accent ? "bg-accent" : "bg-foreground-muted"
+          }`}
+        />
+      </div>
+
+      <p className="mt-4 text-3xl font-black tracking-tight">
+        {value}
+      </p>
+
+      <p className="mt-1 text-xs text-foreground-muted">
+        {description}
+      </p>
+    </div>
+  );
+}
+
+/* -------------------------------- */
+/* READ STATUS */
+/* -------------------------------- */
+
+function ReadStatus({
+  read,
+}: {
+  read: boolean;
+}) {
+  return (
+    <span
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${
+        read
+          ? "border-border bg-background text-foreground-muted"
+          : "border-accent/30 bg-accent/10 text-accent"
+      }`}
+    >
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${
+          read ? "bg-foreground-muted" : "bg-accent"
+        }`}
+      />
+
+      {read ? "Read" : "Unread"}
+    </span>
+  );
+}
+
+/* -------------------------------- */
+/* HELPERS */
+/* -------------------------------- */
+
+function formatNotificationType(type: string) {
+  return type
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (letter) =>
+      letter.toUpperCase()
+    );
+}
+
+function formatDate(date: Date | string) {
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
