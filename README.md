@@ -323,62 +323,6 @@ The application uses responsive layouts, mobile-friendly navigation, responsive 
 
 ---
 
-## Screenshots
-
-### Homepage
-
-Add your homepage screenshot here:
-
-```text
-![Eventora Homepage](./screenshots/homepage.png)
-```
-
-### Events
-
-```text
-![Events Listing](./screenshots/events.png)
-```
-
-### Event Details
-
-```text
-![Event Details](./screenshots/event-details.png)
-```
-
-### User Dashboard
-
-```text
-![User Dashboard](./screenshots/user-dashboard.png)
-```
-
-### Booking
-
-```text
-![Booking Details](./screenshots/booking.png)
-```
-
-### Digital Ticket
-
-```text
-![Digital Ticket](./screenshots/ticket.png)
-```
-
-### Organizer Dashboard
-
-```text
-![Organizer Dashboard](./screenshots/organizer-dashboard.png)
-```
-
-### Admin Dashboard
-
-```text
-![Admin Dashboard](./screenshots/admin-dashboard.png)
-```
-
-> Create a `screenshots` folder in the project root and place your actual screenshots inside it using the filenames above.
-
----
-
 ## Project Structure
 
 ```text
@@ -513,18 +457,6 @@ The application was tested across the major user flows, including:
 
 ---
 
-## Production Deployment
-
-Eventora is deployed using Vercel.
-
-**Production URL:**
-
-[https://events-app-lily1284.vercel.app/](https://events-app-lily1284.vercel.app/)
-
-The project is connected to GitHub for version control and deployment.
-
----
-
 ## What I Learned
 
 This project provided practical experience building and deploying a full-stack application using modern web technologies.
@@ -609,23 +541,3 @@ You should get:
 ```text
 nothing to commit, working tree clean
 ```
-
-### Important for the screenshots
-
-The README above is already prepared for screenshots, but **don't put fake screenshot files into GitHub**. Take real screenshots from your deployed Eventora application and save them as:
-
-```text
-screenshots/
-├── homepage.png
-├── events.png
-├── event-details.png
-├── user-dashboard.png
-├── booking.png
-├── ticket.png
-├── organizer-dashboard.png
-└── admin-dashboard.png
-```
-
-That will make the GitHub repository look substantially more professional to a recruiter.
-
-After this final commit, **Eventora can officially be treated as Portfolio Project #1**, and we can move to choosing **Portfolio Project #2**.
