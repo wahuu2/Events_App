@@ -1,123 +1,89 @@
-# Eventora — Event Management & Booking Platform
+# 🚀 Eventora — Modern Event Management & Booking Platform
+> Empowering organizers and attendees through seamless event experiences.
 
-Eventora is a full-stack event management and ticket booking platform built with Next.js. It allows users to discover events, make bookings, complete payments through a simulated payment flow, receive digital tickets and notifications, while organizers and administrators manage the platform through dedicated dashboards.
+Eventora is a full‑stack event management and ticket booking platform built with Next.js. It empowers users to discover, book, and manage events effortlessly while providing organizers and administrators with powerful dashboards for complete control.
 
 ---
 
-## Project Overview
+## 🌟 Highlights
+- Full‑stack architecture with Next.js App Router
+- Secure authentication via Clerk
+- Real‑time notifications and ticket generation
+- Role‑based dashboards for users, organizers, and admins
+- Production deployment on Vercel
 
-Eventora was built as a production-style full-stack web application to demonstrate modern web development, authentication, database management, API development, role-based authorization, security, responsive UI design, and deployment.
+---
+
+## 🧩 Project Overview
+Eventora is engineered as a production‑grade full‑stack web application to demonstrate modern web development, authentication, database management, API development, role‑based authorization, security, responsive UI design, and deployment.
 
 The platform supports three main user roles:
 
-- **Users** — Discover events, make bookings, pay for bookings and access digital tickets.
-- **Organizers** — Create and manage events, monitor bookings and manage event tickets.
-- **Administrators** — Manage users, organizers, events, bookings, payments, tickets, notifications and platform analytics.
+- **Users** — Discover events, make bookings, pay for bookings, and access digital tickets.
+- **Organizers** — Create and manage events, monitor bookings, and manage event tickets.
+- **Administrators** — Manage users, organizers, events, bookings, payments, tickets, notifications, and platform analytics.
 
 ---
 
-## Key Features
+## ⚙️ Key Features
 
 ### User Features
-
-- User registration and authentication
-- Browse public events
-- Search and filter events
-- View detailed event information
-- Book events
-- View booking history
-- View individual booking details
-- Simulated payment processing
-- Booking confirmation
-- Digital ticket generation
-- Digital ticket verification
-- Print digital tickets
-- Notifications
-- Notification preferences
-- Responsive dashboard
+- User registration and authentication  
+- Browse public events  
+- Search and filter events  
+- View detailed event information  
+- Book events  
+- View booking history  
+- View individual booking details  
+- Simulated payment processing  
+- Booking confirmation  
+- Digital ticket generation & verification  
+- Print digital tickets  
+- Notifications & preferences  
+- Responsive dashboard  
 
 ### Organizer Features
-
-- Organizer dashboard
-- Create events
-- Edit events
-- Delete/manage events
-- View event statistics
-- View event bookings
-- Monitor attendee information
-- Manage tickets
-- Track event performance
+- Organizer dashboard  
+- Create, edit, and delete events  
+- View event statistics and bookings  
+- Monitor attendee information  
+- Manage tickets  
+- Track event performance  
 
 ### Administrator Features
-
-- Admin dashboard
-- User management
-- Organizer management
-- Event management
-- Booking management
-- Payment management
-- Ticket management
-- Notification management
-- Platform analytics
-- Role-based access control
-
-### Security Features
-
-- Authentication with Clerk
-- Role-based authorization
-- Protected API routes
-- User ownership validation
-- Organizer ownership validation
-- Admin-only routes
-- Input validation
-- Invalid ID handling
-- API rate limiting
-- Protected payment operations
-- Protected ticket verification
-- Environment variable protection
-- Generic production error responses
+- Admin dashboard  
+- User, organizer, and event management  
+- Booking, payment, ticket, and notification management  
+- Platform analytics  
+- Role‑based access control  
 
 ---
 
-## Tech Stack
-
-### Frontend
-
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- Heroicons
-
-### Backend
-
-- Next.js API Routes
-- Server-side authentication
-- REST-style API endpoints
-- Server-side authorization
-
-### Database
-
-- MongoDB
-- Mongoose
-
-### Authentication
-
-- Clerk
-
-### Rate Limiting
-
-- Upstash Redis
-
-### Deployment
-
-- Vercel
-- GitHub
+## 🛡️ Security Features
+- Authentication with Clerk  
+- Role‑based authorization  
+- Protected API routes  
+- User & organizer ownership validation  
+- Admin‑only routes  
+- Input validation & invalid ID handling  
+- API rate limiting with Upstash Redis  
+- Protected payment operations  
+- Environment variable protection  
+- Generic production error responses  
 
 ---
 
-## System Architecture
+## 🧠 Tech Stack
+**Frontend:** Next.js, React, TypeScript, Tailwind CSS, Heroicons  
+**Backend:** Next.js API Routes, REST‑style endpoints, server‑side auth  
+**Database:** MongoDB, Mongoose  
+**Authentication:** Clerk  
+**Rate Limiting:** Upstash Redis  
+**Deployment:** Vercel, GitHub  
 
+---
+
+## 🏗️ System Architecture
 ```text
 User
  │
@@ -135,401 +101,149 @@ Next.js Frontend
  │                           Mongoose
  │
  └── Rate Limiting ─────────► Upstash Redis
-````
+🔐 Role‑Based Access
+Role	Main Access
+User	Events, bookings, payments, tickets, notifications
+Organizer	Event management, bookings, tickets, statistics
+Admin	Complete platform management
 
----
 
-## Main Application Flow
+🧾 API Structure
+Events: /api/events, /api/events/[id]
 
-```text
-Visitor
-   │
-   ▼
-Discover Events
-   │
-   ▼
-View Event Details
-   │
-   ▼
-Sign In / Sign Up
-   │
-   ▼
-Create Booking
-   │
-   ▼
-Payment
-   │
-   ▼
-Booking Confirmed
-   │
-   ▼
-Ticket Generated
-   │
-   ▼
-Notification Sent
-```
+Bookings: /api/bookings, /api/bookings/[id]
 
----
+Payments: /api/payments
 
-## Role-Based Access
+Tickets: /api/tickets, /api/tickets/verify
 
-Eventora uses role-based authorization to separate access between users, organizers and administrators.
+Notifications: /api/notifications, /api/notifications/[id], /api/notifications/unread, /api/notifications/cleanup, /api/notifications/preferences
 
-| Role      | Main Access                                        |
-| --------- | -------------------------------------------------- |
-| User      | Events, bookings, payments, tickets, notifications |
-| Organizer | Event management, bookings, tickets, statistics    |
-| Admin     | Complete platform management                       |
+Organizer: /api/organizer/*
 
-Unauthorized users cannot access protected organizer or administrator functionality.
+Administrator: /api/admin/*
 
----
-
-## API Structure
-
-The application uses Next.js API routes for backend functionality.
-
-### Events
-
-```text
-/api/events
-/api/events/[id]
-```
-
-### Bookings
-
-```text
-/api/bookings
-/api/bookings/[id]
-```
-
-### Payments
-
-```text
-/api/payments
-```
-
-### Tickets
-
-```text
-/api/tickets
-/api/tickets/verify
-```
-
-### Notifications
-
-```text
-/api/notifications
-/api/notifications/[id]
-/api/notifications/unread
-/api/notifications/cleanup
-/api/notifications/preferences
-```
-
-### Organizer
-
-```text
-/api/organizer/stats
-/api/organizer/events
-/api/organizer/events/[id]
-/api/organizer/events/[id]/stats
-/api/organizer/bookings
-```
-
-### Administrator
-
-```text
-/api/admin/users
-/api/admin/organizers
-/api/admin/events
-/api/admin/bookings
-/api/admin/payments
-/api/admin/tickets
-/api/admin/notifications
-/api/admin/analytics
-```
-
----
-
-## Database Models
-
-Eventora uses MongoDB with Mongoose models for the main application entities.
-
-```text
+🗃️ Database Models
 User
- │
- ├── Bookings
- ├── Payments
- ├── Tickets
- └── Notifications
 
 Event
- │
- ├── Bookings
- └── Tickets
 
 Booking
- │
- ├── Payment
- └── Ticket
-```
 
-Main models:
+Payment
 
-* User
-* Event
-* Booking
-* Payment
-* Ticket
-* Notification
+Ticket
 
----
+Notification
 
-## Notifications
+🔔 Notifications
+Supports:
 
-The notification system supports different event and booking-related notifications, including:
+Registration confirmation
 
-* Registration confirmation
-* Booking confirmation
-* Successful payment
-* Ticket generation
-* New booking notifications
-* Event updates
-* Event cancellations
-* Event reminders
+Booking confirmation
 
-Users can also manage their notification preferences.
+Successful payment
 
----
+Ticket generation
 
-## Responsive Design
+New booking notifications
 
-The interface was designed to work across:
+Event updates & cancellations
 
-* Mobile devices
-* Tablets
-* Laptops
-* Desktop screens
+Event reminders
 
-The application uses responsive layouts, mobile-friendly navigation, responsive tables/cards and accessible interactive elements.
+User preferences
 
----
+📱 Responsive Design
+Optimized for mobile, tablet, laptop, and desktop with responsive layouts, accessible navigation, and adaptive components.
 
-## Project Structure
-
-```text
-EventApp/
-│
-├── public/
-│
+🧱 Project Structure
+text
+Eventora/
 ├── src/
 │   ├── app/
-│   │   ├── admin/
-│   │   ├── api/
-│   │   ├── dashboard/
-│   │   ├── events/
-│   │   ├── sign-in/
-│   │   ├── sign-up/
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   │
 │   ├── components/
-│   │
 │   ├── database/
-│   │   ├── user.model.ts
-│   │   ├── event.model.ts
-│   │   ├── booking.model.ts
-│   │   ├── payment.model.ts
-│   │   ├── ticket.model.ts
-│   │   └── notification.model.ts
-│   │
 │   ├── lib/
-│   │   ├── auth.ts
-│   │   ├── notifications.ts
-│   │   └── rate-limit.ts
-│   │
 │   └── proxy.ts
-│
 ├── public/
 ├── .env.local
-├── .gitignore
-├── next.config.ts
-├── package.json
-├── package-lock.json
-├── postcss.config.mjs
-├── README.md
-└── tsconfig.json
-```
+└── README.md
+🧪 Testing
+Flows tested: authentication, event creation, booking, payment, ticket generation, notifications, organizer/admin authorization, API validation, rate limiting, responsive layouts, and deployment.
 
----
+🎓 What I Learned
+Hands‑on experience with:
 
-## Installation
+Next.js App Router
 
-Clone the repository:
+TypeScript & React
 
-```bash
-git clone https://github.com/wahuu2/Events_App.git
-```
+Tailwind CSS
 
-Navigate into the project:
+MongoDB & Mongoose
 
-```bash
-cd Events_App
-```
+Clerk authentication
 
-Install dependencies:
+Role‑based authorization
 
-```bash
-npm install
-```
+REST API development
 
-Run the development server:
+Payment workflow design
 
-```bash
-npm run dev
-```
+Digital ticket systems
 
-Open:
+Notification systems
 
-```text
-http://localhost:3000
-```
+API security & rate limiting
 
----
+Responsive UI/UX
 
-## Environment Variables
+Git, GitHub, and Vercel deployment
 
-Create a `.env.local` file and configure the required environment variables:
+🚀 Future Improvements
+Real M‑Pesa & card payment integration
 
-```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
+Email notifications
 
-MONGODB_URI=
+QR‑code ticket scanning
 
-CLERK_WEBHOOK_SIGNING_SECRET=
+Event reminders
 
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=
-NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=
-NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=
+Advanced analytics
 
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
-```
+Organizer verification
 
-Never commit `.env.local` or expose secret keys publicly.
+Image upload & cloud storage
 
----
+Automated testing
 
-## Testing
+Event reviews & ratings
 
-The application was tested across the major user flows, including:
-
-* Authentication
-* User registration
-* User login
-* Event creation
-* Event management
-* Event browsing
-* Event search and filtering
-* Booking creation
-* Booking ownership
-* Payment flow
-* Ticket generation
-* Ticket verification
-* Notifications
-* Organizer authorization
-* Admin authorization
-* API validation
-* Rate limiting
-* Responsive layouts
-* Production deployment
-
----
-
-## What I Learned
-
-This project provided practical experience building and deploying a full-stack application using modern web technologies.
-
-Key areas covered:
-
-* Next.js App Router
-* TypeScript
-* React
-* Tailwind CSS
-* MongoDB
-* Mongoose
-* Clerk authentication
-* Role-based authorization
-* REST API development
-* Database relationships
-* Payment workflow design
-* Digital ticket systems
-* Notification systems
-* API security
-* Rate limiting
-* Responsive UI/UX
-* Git and GitHub
-* Vercel deployment
-* Production debugging
-
----
-
-## Future Improvements
-
-Possible future improvements include:
-
-* Real M-Pesa payment integration
-* Real card payment integration
-* Email notifications
-* QR-code ticket scanning
-* Event reminders
-* Advanced analytics
-* Event categories
-* Organizer verification
-* Image upload and cloud storage
-* Automated testing
-* Event reviews and ratings
-
----
-
-## Developer
-
-**Lily Wahu Ngugi**
-
+👩‍💻 Developer
+Lily Wahu Ngugi  
 Junior Web Developer | ICT Graduate
 
-GitHub:
-[https://github.com/wahuu2](https://github.com/wahuu2)
+GitHub: https://github.com/wahuu2
+
+⚖️ License
+Created for learning, portfolio development, and demonstration of full‑stack web development skills.
+
+Code
 
 ---
 
-## License
-
-This project was created for learning, portfolio development and demonstration of full-stack web development skills.
-
-````
-
-### Your final Git steps
-
-After replacing the README:
-
+### ✅ Final Git Steps
 ```powershell
 git add README.md
 git commit -m "Update README for production portfolio"
 git push
-````
-
 Then verify:
 
-```powershell
+powershell
 git status
-```
+You should see:
 
-You should get:
-
-```text
+text
 nothing to commit, working tree clean
-```
