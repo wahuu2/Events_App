@@ -2,14 +2,6 @@
 
 Eventora is a full-stack event management and ticket booking platform built with Next.js. It allows users to discover events, make bookings, complete payments through a simulated payment flow, receive digital tickets and notifications, while organizers and administrators manage the platform through dedicated dashboards.
 
-## Live Demo
-
-**Live Application:**  
-https://events-app-lily1284.vercel.app/
-
-**GitHub Repository:**  
-https://github.com/wahuu2/Events_App
-
 ---
 
 ## Project Overview
