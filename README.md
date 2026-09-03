@@ -1,6 +1,3 @@
-Yes. Use this as the **final professional README** for your EventApp/Eventora project. Replace your current `README.md` with it.
-
-````markdown
 # Eventora — Event Management & Booking Platform
 
 Eventora is a full-stack event management and ticket booking platform built with Next.js. It allows users to discover events, make bookings, complete payments through a simulated payment flow, receive digital tickets and notifications, while organizers and administrators manage the platform through dedicated dashboards.
