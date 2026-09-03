@@ -83,8 +83,9 @@ The platform supports three main user roles:
 
 ---
 
+```markdown
 ## 🏗️ System Architecture
-
+```text
 User
  │
  ▼
@@ -101,78 +102,60 @@ Next.js Frontend
  │                           Mongoose
  │
  └── Rate Limiting ─────────► Upstash Redis
-
+```
 
 ---
 
 ## 🔐 Role‑Based Access
-Role	Main Access
-User	Events, bookings, payments, tickets, notifications
-Organizer	Event management, bookings, tickets, statistics
-Admin	Complete platform management
+| Role      | Main Access                                        |
+| --------- | -------------------------------------------------- |
+| User      | Events, bookings, payments, tickets, notifications |
+| Organizer | Event management, bookings, tickets, statistics    |
+| Admin     | Complete platform management                       |
 
 ---
 
 ## 🧾 API Structure
-Events: /api/events, /api/events/[id]
-
-Bookings: /api/bookings, /api/bookings/[id]
-
-Payments: /api/payments
-
-Tickets: /api/tickets, /api/tickets/verify
-
-Notifications: /api/notifications, /api/notifications/[id], /api/notifications/unread, /api/notifications/cleanup, /api/notifications/preferences
-
-Organizer: /api/organizer/*
-
-Administrator: /api/admin/*
+- **Events:** `/api/events`, `/api/events/[id]`  
+- **Bookings:** `/api/bookings`, `/api/bookings/[id]`  
+- **Payments:** `/api/payments`  
+- **Tickets:** `/api/tickets`, `/api/tickets/verify`  
+- **Notifications:** `/api/notifications`, `/api/notifications/[id]`, `/api/notifications/unread`, `/api/notifications/cleanup`, `/api/notifications/preferences`  
+- **Organizer:** `/api/organizer/*`  
+- **Administrator:** `/api/admin/*`  
 
 ---
 
-🗃️ Database Models
-User
-
-Event
-
-Booking
-
-Payment
-
-Ticket
-
-Notification
+## 🗃️ Database Models
+- User  
+- Event  
+- Booking  
+- Payment  
+- Ticket  
+- Notification  
 
 ---
 
 ## 🔔 Notifications
-Supports:
-
-Registration confirmation
-
-Booking confirmation
-
-Successful payment
-
-Ticket generation
-
-New booking notifications
-
-Event updates & cancellations
-
-Event reminders
-
-User preferences
+Supports:  
+- Registration confirmation  
+- Booking confirmation  
+- Successful payment  
+- Ticket generation  
+- New booking notifications  
+- Event updates & cancellations  
+- Event reminders  
+- User preferences  
 
 ---
 
 ## 📱 Responsive Design
-Optimized for mobile, tablet, laptop, and desktop with responsive layouts, accessible navigation, and adaptive components.
+Optimized for **mobile, tablet, laptop, and desktop** with responsive layouts, accessible navigation, and adaptive components.
 
-----
+---
 
-#🧱 Project Structure
-
+## 🧱 Project Structure
+```text
 Eventora/
 ├── src/
 │   ├── app/
@@ -183,83 +166,74 @@ Eventora/
 ├── public/
 ├── .env.local
 └── README.md
+```
 
 ---
 
 ## 🧪 Testing
-Flows tested: authentication, event creation, booking, payment, ticket generation, notifications, organizer/admin authorization, API validation, rate limiting, responsive layouts, and deployment.
+Flows tested include:  
+- Authentication  
+- Event creation & management  
+- Booking creation & ownership  
+- Payment flow  
+- Ticket generation & verification  
+- Notifications  
+- Organizer/admin authorization  
+- API validation  
+- Rate limiting  
+- Responsive layouts  
+- Deployment  
 
 ---
 
 ## 🎓 What I Learned
-Hands‑on experience with:
-
-- Next.js App Router
-
-- TypeScript & React
-
-- Tailwind CSS
-
-- MongoDB & Mongoose
-
-- Clerk authentication
-
-- Role‑based authorization
-
-- REST API development
-
-- Payment workflow design
-
-- Digital ticket systems
-
-- Notification systems
-
-- API security & rate limiting
-
-- Responsive UI/UX
-
-- Git, GitHub, and Vercel deployment
+Hands‑on experience with:  
+- Next.js App Router  
+- TypeScript & React  
+- Tailwind CSS  
+- MongoDB & Mongoose  
+- Clerk authentication  
+- Role‑based authorization  
+- REST API development  
+- Payment workflow design  
+- Digital ticket systems  
+- Notification systems  
+- API security & rate limiting  
+- Responsive UI/UX  
+- Git, GitHub, and Vercel deployment  
 
 ---
 
 ## 🚀 Future Improvements
-- Real M‑Pesa & card payment integration
-
-- Email notifications
-
-- QR‑code ticket scanning
-
-- Event reminders
-
-- Advanced analytics
-
-- Organizer verification
-
-- Image upload & cloud storage
-
-- Automated testing
-
-- Event reviews & ratings
+- Real M‑Pesa & card payment integration  
+- Email notifications  
+- QR‑code ticket scanning  
+- Event reminders  
+- Advanced analytics  
+- Organizer verification  
+- Image upload & cloud storage  
+- Automated testing  
+- Event reviews & ratings  
 
 ---
 
 ## ⚖️ License
-Created for learning, portfolio development, and demonstration of full‑stack web development skills.
-
-Code
+Created for **learning, portfolio development, and demonstration of full‑stack web development skills**.
 
 ---
 
-### ✅ Final Git Steps
-```powershell
+## ✅ Final Git Steps
+```bash
 git add README.md
 git commit -m "Update README for production portfolio"
 git push
-Then verify:
+```
 
-powershell
+Verify:
+```bash
 git status
-You should see:
-
-text
+```
+Expected output:
+```text
 nothing to commit, working tree clean
+```
