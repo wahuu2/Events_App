@@ -74,7 +74,7 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* ===================================================== */}
-      {/* DESKTOP ADMIN SIDEBAR */}
+      {/* DESKTOP SIDEBAR */}
       {/* ===================================================== */}
 
       <aside className="fixed inset-y-0 left-0 z-50 hidden w-72 border-r border-border bg-background-secondary lg:flex lg:flex-col">
@@ -88,7 +88,7 @@ export default async function AdminLayout({
                 <div className="absolute -right-3 -top-3 h-7 w-7 rounded-full border border-white/20 bg-white/10" />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <p className="text-lg font-black tracking-tight">
                   Eventora
                 </p>
@@ -101,11 +101,11 @@ export default async function AdminLayout({
           </Link>
         </div>
 
-        {/* Admin Identity */}
+        {/* Administrator Identity */}
         <div className="px-5 py-5">
           <div className="rounded-2xl border border-border bg-background p-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-sm font-bold text-accent">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-sm font-bold text-accent">
                 A
               </div>
 
@@ -115,9 +115,9 @@ export default async function AdminLayout({
                 </p>
 
                 <div className="mt-1 flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
 
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-foreground-muted">
+                  <span className="truncate text-[10px] font-semibold uppercase tracking-wider text-foreground-muted">
                     System Access
                   </span>
                 </div>
@@ -126,8 +126,8 @@ export default async function AdminLayout({
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
+        {/* Desktop Navigation */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6">
           <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground-muted">
             Platform
           </p>
@@ -144,7 +144,7 @@ export default async function AdminLayout({
                 </span>
 
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold">
+                  <span className="block truncate text-sm font-semibold">
                     {item.label}
                   </span>
 
@@ -153,7 +153,7 @@ export default async function AdminLayout({
                   </span>
                 </span>
 
-                <span className="text-sm text-foreground-muted opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100">
+                <span className="shrink-0 text-sm text-foreground-muted opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100">
                   →
                 </span>
               </Link>
@@ -165,19 +165,19 @@ export default async function AdminLayout({
         <div className="border-t border-border p-4">
           <Link
             href="/dashboard"
-            className="group flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 transition hover:border-border-hover"
+            className="group flex items-center justify-between gap-3 rounded-xl border border-border bg-background px-4 py-3 transition hover:border-border-hover hover:bg-background-secondary"
           >
-            <div>
-              <p className="text-xs font-semibold">
+            <div className="min-w-0">
+              <p className="truncate text-xs font-semibold">
                 Return to Eventora
               </p>
 
-              <p className="mt-1 text-[10px] text-foreground-muted">
+              <p className="mt-1 truncate text-[10px] text-foreground-muted">
                 User dashboard
               </p>
             </div>
 
-            <span className="text-foreground-muted transition group-hover:translate-x-1 group-hover:text-foreground">
+            <span className="shrink-0 text-foreground-muted transition group-hover:translate-x-1 group-hover:text-foreground">
               →
             </span>
           </Link>
@@ -189,21 +189,24 @@ export default async function AdminLayout({
       {/* ===================================================== */}
 
       <div className="lg:pl-72">
-        {/* Top Bar */}
+        {/* ================================================= */}
+        {/* TOP BAR */}
+        {/* ================================================= */}
+
         <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
           <div className="container-responsive">
-            <div className="flex min-h-16 items-center justify-between gap-4">
+            <div className="flex min-h-16 items-center gap-3">
               {/* Mobile Brand */}
               <Link
                 href="/admin"
-                className="flex items-center gap-2.5 lg:hidden"
+                className="flex min-w-0 items-center gap-2.5 lg:hidden"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-sm font-black text-white">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-sm font-black text-white">
                   E
                 </div>
 
-                <div>
-                  <p className="text-sm font-black">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-black">
                     Eventora
                   </p>
 
@@ -228,8 +231,9 @@ export default async function AdminLayout({
                 </span>
               </div>
 
-              {/* Status + Dashboard */}
-              <div className="ml-auto flex items-center gap-3">
+              {/* Right Side */}
+              <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+                {/* Admin Status */}
                 <div className="hidden items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 sm:flex">
                   <span className="h-1.5 w-1.5 rounded-full bg-accent" />
 
@@ -238,11 +242,18 @@ export default async function AdminLayout({
                   </span>
                 </div>
 
+                {/* User Dashboard */}
                 <Link
                   href="/dashboard"
-                  className="rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold transition hover:border-border-hover hover:bg-background-secondary sm:px-4 sm:text-sm"
+                  className="rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold transition hover:border-border-hover hover:bg-background-secondary sm:px-4 sm:text-sm"
                 >
-                  User Dashboard
+                  <span className="sm:hidden">
+                    Dashboard
+                  </span>
+
+                  <span className="hidden sm:inline">
+                    User Dashboard
+                  </span>
                 </Link>
               </div>
             </div>
@@ -255,26 +266,37 @@ export default async function AdminLayout({
 
         <div className="border-b border-border bg-background-secondary lg:hidden">
           <div className="container-responsive">
-            <nav className="flex gap-1 overflow-x-auto py-2.5">
+            <nav
+              className="flex gap-2 overflow-x-auto py-3"
+              style={{
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
+            >
               {adminNavigation.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="flex shrink-0 items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold transition hover:border-border-hover hover:bg-card"
+                  className="flex min-h-10 shrink-0 items-center gap-2 rounded-xl border border-border bg-background px-3.5 py-2 text-xs font-semibold transition hover:border-accent/30 hover:bg-card"
                 >
                   <span className="text-accent">
                     {item.icon}
                   </span>
 
-                  {item.label}
+                  <span>{item.label}</span>
                 </Link>
               ))}
             </nav>
           </div>
         </div>
 
-        {/* Admin Page Content */}
-        <main>{children}</main>
+        {/* ================================================= */}
+        {/* ADMIN CONTENT */}
+        {/* ================================================= */}
+
+        <main className="min-w-0">
+          {children}
+        </main>
       </div>
     </div>
   );

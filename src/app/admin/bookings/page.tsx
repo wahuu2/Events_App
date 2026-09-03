@@ -40,12 +40,16 @@ export default async function AdminBookingsPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* ===================================================== */}
       {/* PAGE HEADER */}
+      {/* ===================================================== */}
+
       <section className="border-b border-border">
         <div className="container-responsive py-8 sm:py-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-
+            {/* Heading */}
+            <div className="min-w-0">
+              
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">
                 Platform Management
               </p>
@@ -60,7 +64,8 @@ export default async function AdminBookingsPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card px-5 py-4">
+            {/* Total Bookings */}
+            <div className="w-full rounded-2xl border border-border bg-card px-5 py-4 sm:w-fit">
               <p className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                 Total Bookings
               </p>
@@ -73,7 +78,10 @@ export default async function AdminBookingsPage() {
         </div>
       </section>
 
+      {/* ===================================================== */}
       {/* STAT CARDS */}
+      {/* ===================================================== */}
+
       <section className="container-responsive py-6">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
@@ -103,38 +111,45 @@ export default async function AdminBookingsPage() {
         </div>
       </section>
 
+      {/* ===================================================== */}
       {/* REVENUE SUMMARY */}
+      {/* ===================================================== */}
+
       <section className="container-responsive pb-6">
-        <div className="relative overflow-hidden rounded-2xl border border-accent/20 bg-accent/10 p-6">
+        <div className="relative overflow-hidden rounded-2xl border border-accent/20 bg-accent/10 p-5 sm:p-6">
           <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full border border-accent/10 bg-accent/5" />
 
-          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
                 Confirmed Revenue
               </p>
 
-              <p className="mt-2 text-3xl font-black tracking-tight">
+              <p className="mt-2 break-words text-2xl font-black tracking-tight sm:text-3xl">
                 {formatAmount(confirmedRevenue)}
               </p>
 
-              <p className="mt-1 text-xs text-foreground-secondary">
+              <p className="mt-1 max-w-xl text-xs leading-5 text-foreground-secondary">
                 Revenue generated from confirmed bookings.
               </p>
             </div>
 
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-accent/20 bg-background text-lg font-black text-accent">
-              $
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-accent/20 bg-background text-lg font-black text-accent">
+              KES
             </div>
           </div>
         </div>
       </section>
 
+      {/* ===================================================== */}
       {/* BOOKINGS TABLE */}
+      {/* ===================================================== */}
+
       <section className="container-responsive pb-10">
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          {/* Table Header */}
+          <div className="flex flex-col gap-3 border-b border-border px-4 py-5 sm:px-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <h2 className="text-base font-bold">
                 Booking Activity
               </h2>
@@ -149,8 +164,9 @@ export default async function AdminBookingsPage() {
             </span>
           </div>
 
+          {/* Empty State */}
           {bookings.length === 0 ? (
-            <div className="px-6 py-16 text-center">
+            <div className="px-5 py-16 text-center sm:px-6">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background text-lg text-foreground-muted">
                 □
               </div>
@@ -165,6 +181,10 @@ export default async function AdminBookingsPage() {
               </p>
             </div>
           ) : (
+            /*
+             * The table keeps its desktop structure while
+             * allowing horizontal scrolling on smaller screens.
+             */
             <div className="table-wrapper">
               <table className="w-full min-w-[1100px]">
                 <thead>
@@ -254,7 +274,8 @@ export default async function AdminBookingsPage() {
                         <td className="px-5 py-5">
                           <div className="min-w-0 max-w-[220px]">
                             <p className="truncate text-sm font-semibold">
-                              {event?.title || "Unknown Event"}
+                              {event?.title ||
+                                "Unknown Event"}
                             </p>
 
                             <p className="mt-1 truncate text-[10px] text-foreground-muted">
@@ -266,7 +287,7 @@ export default async function AdminBookingsPage() {
 
                         {/* REFERENCE */}
                         <td className="px-5 py-5">
-                          <span className="rounded-lg border border-border bg-background px-2.5 py-1.5 font-mono text-[10px] font-semibold text-foreground-secondary">
+                          <span className="inline-block max-w-[150px] truncate rounded-lg border border-border bg-background px-2.5 py-1.5 font-mono text-[10px] font-semibold text-foreground-secondary">
                             {booking.bookingReference ||
                               "N/A"}
                           </span>
@@ -281,7 +302,7 @@ export default async function AdminBookingsPage() {
 
                         {/* AMOUNT */}
                         <td className="px-5 py-5">
-                          <span className="text-sm font-bold">
+                          <span className="whitespace-nowrap text-sm font-bold">
                             {formatAmount(
                               Number(booking.totalAmount) || 0
                             )}
@@ -297,7 +318,7 @@ export default async function AdminBookingsPage() {
 
                         {/* CREATED */}
                         <td className="px-5 py-5 text-right">
-                          <span className="text-xs text-foreground-secondary">
+                          <span className="whitespace-nowrap text-xs text-foreground-secondary">
                             {formatDate(booking.createdAt)}
                           </span>
                         </td>
@@ -314,9 +335,9 @@ export default async function AdminBookingsPage() {
   );
 }
 
-/* -------------------------------- */
+/* ========================================================= */
 /* STAT CARD */
-/* -------------------------------- */
+/* ========================================================= */
 
 function StatCard({
   label,
@@ -343,8 +364,10 @@ function StatCard({
         </p>
 
         <span
-          className={`h-2 w-2 rounded-full ${
-            accent ? "bg-accent" : "bg-foreground-muted"
+          className={`h-2 w-2 shrink-0 rounded-full ${
+            accent
+              ? "bg-accent"
+              : "bg-foreground-muted"
           }`}
         />
       </div>
@@ -360,9 +383,9 @@ function StatCard({
   );
 }
 
-/* -------------------------------- */
+/* ========================================================= */
 /* STATUS BADGE */
-/* -------------------------------- */
+/* ========================================================= */
 
 function StatusBadge({
   status,
@@ -376,26 +399,25 @@ function StatusBadge({
         ? "border-border bg-background-secondary text-foreground"
         : "border-border bg-background text-foreground-muted";
 
+  const dot =
+    status === "confirmed"
+      ? "bg-accent"
+      : "bg-foreground-muted";
+
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${styles}`}
+      className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${styles}`}
     >
-      <span
-        className={`h-1.5 w-1.5 rounded-full ${
-          status === "confirmed"
-            ? "bg-accent"
-            : "bg-foreground-muted"
-        }`}
-      />
+      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
 
       {status}
     </span>
   );
 }
 
-/* -------------------------------- */
+/* ========================================================= */
 /* HELPERS */
-/* -------------------------------- */
+/* ========================================================= */
 
 function getInitials(
   firstName?: string,

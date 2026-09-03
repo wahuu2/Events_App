@@ -48,7 +48,8 @@ export async function GET(
       return NextResponse.json(
         {
           success: false,
-          message: "Only organizers can access event analytics",
+          message:
+            "Only organizers can access event analytics",
         },
         { status: 403 }
       );
@@ -84,7 +85,8 @@ export async function GET(
       return NextResponse.json(
         {
           success: false,
-          message: "You can only access your own events",
+          message:
+            "You can only access your own events",
         },
         { status: 403 }
       );
@@ -192,10 +194,10 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -244,11 +246,15 @@ export async function PATCH(
     }
 
     // Organizer can only update their own events
-    if (event.organizer.toString() !== user._id.toString()) {
+    if (
+      event.organizer.toString() !==
+      user._id.toString()
+    ) {
       return NextResponse.json(
         {
           success: false,
-          message: "You can only update your own events",
+          message:
+            "You can only update your own events",
         },
         { status: 403 }
       );
@@ -288,7 +294,8 @@ export async function PATCH(
       return NextResponse.json(
         {
           success: false,
-          message: "Please provide all required event fields.",
+          message:
+            "Please provide all required event fields.",
         },
         { status: 400 }
       );
@@ -297,7 +304,10 @@ export async function PATCH(
     // Validate price
     const eventPrice = Number(event.price);
 
-    if (Number.isNaN(eventPrice) || eventPrice < 0) {
+    if (
+      Number.isNaN(eventPrice) ||
+      eventPrice < 0
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -319,7 +329,8 @@ export async function PATCH(
       return NextResponse.json(
         {
           success: false,
-          message: "Capacity must be a whole number greater than 0.",
+          message:
+            "Capacity must be a whole number greater than 0.",
         },
         { status: 400 }
       );

@@ -21,12 +21,16 @@ export default async function AdminOrganizersPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* ===================================================== */}
       {/* PAGE HEADER */}
+      {/* ===================================================== */}
+
       <section className="border-b border-border">
         <div className="container-responsive py-8 sm:py-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-
+            {/* Heading */}
+            <div className="min-w-0">
+              
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">
                 Platform Management
               </p>
@@ -36,12 +40,13 @@ export default async function AdminOrganizersPage() {
               </h1>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground-secondary">
-                Manage the people and organizations responsible for
-                creating events on Eventora.
+                Manage the people and organizations responsible
+                for creating events on Eventora.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card px-5 py-4">
+            {/* Total Organizers */}
+            <div className="w-full rounded-2xl border border-border bg-card px-5 py-4 sm:w-fit">
               <p className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                 Total Organizers
               </p>
@@ -54,9 +59,12 @@ export default async function AdminOrganizersPage() {
         </div>
       </section>
 
+      {/* ===================================================== */}
       {/* SUMMARY */}
+      {/* ===================================================== */}
+
       <section className="container-responsive py-6">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <SummaryCard
             label="Total Organizers"
             value={totalOrganizers}
@@ -78,12 +86,15 @@ export default async function AdminOrganizersPage() {
         </div>
       </section>
 
+      {/* ===================================================== */}
       {/* ORGANIZERS */}
+      {/* ===================================================== */}
+
       <section className="container-responsive pb-10">
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          {/* TABLE HEADER */}
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          {/* Table Header */}
+          <div className="flex flex-col gap-3 border-b border-border px-4 py-5 sm:px-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <h2 className="text-base font-bold">
                 Event Organizers
               </h2>
@@ -98,8 +109,9 @@ export default async function AdminOrganizersPage() {
             </span>
           </div>
 
+          {/* Empty State */}
           {organizers.length === 0 ? (
-            <div className="px-6 py-16 text-center">
+            <div className="px-5 py-16 text-center sm:px-6">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background text-lg text-foreground-muted">
                 ◇
               </div>
@@ -114,6 +126,10 @@ export default async function AdminOrganizersPage() {
               </p>
             </div>
           ) : (
+            /*
+             * The table remains readable on small screens.
+             * Only the table area scrolls horizontally.
+             */
             <div className="table-wrapper">
               <table className="w-full min-w-[780px]">
                 <thead>
@@ -163,11 +179,11 @@ export default async function AdminOrganizersPage() {
                             </div>
 
                             <div className="min-w-0">
-                              <p className="truncate text-sm font-bold">
+                              <p className="max-w-[220px] truncate text-sm font-bold">
                                 {fullName}
                               </p>
 
-                              <p className="mt-0.5 truncate text-[10px] text-foreground-muted">
+                              <p className="mt-0.5 text-[10px] text-foreground-muted">
                                 ID:{" "}
                                 {organizer._id
                                   .toString()
@@ -179,28 +195,28 @@ export default async function AdminOrganizersPage() {
 
                         {/* EMAIL */}
                         <td className="px-5 py-4">
-                          <span className="text-sm text-foreground-secondary">
+                          <span className="block max-w-[260px] truncate text-sm text-foreground-secondary">
                             {organizer.email || "No email"}
                           </span>
                         </td>
 
                         {/* ROLE */}
                         <td className="px-5 py-4">
-                          <span className="inline-flex rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-accent">
+                          <span className="inline-flex whitespace-nowrap rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-accent">
                             Organizer
                           </span>
                         </td>
 
                         {/* DATE */}
                         <td className="px-5 py-4">
-                          <span className="text-xs text-foreground-secondary">
+                          <span className="whitespace-nowrap text-xs text-foreground-secondary">
                             {formatDate(organizer.createdAt)}
                           </span>
                         </td>
 
                         {/* ACCESS */}
                         <td className="px-5 py-4 text-right">
-                          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground-secondary">
+                          <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-border bg-background px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground-secondary">
                             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                             Event Access
                           </span>
@@ -218,9 +234,9 @@ export default async function AdminOrganizersPage() {
   );
 }
 
-/* -------------------------------- */
+/* ========================================================= */
 /* SUMMARY CARD */
-/* -------------------------------- */
+/* ========================================================= */
 
 function SummaryCard({
   label,
@@ -235,17 +251,27 @@ function SummaryCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border p-5 ${
+      className={`rounded-2xl border p-5 transition ${
         accent
           ? "border-accent/30 bg-accent/10"
-          : "border-border bg-card"
+          : "border-border bg-card hover:border-border-hover"
       }`}
     >
-      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-foreground-muted">
-        {label}
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-foreground-muted">
+          {label}
+        </p>
 
-      <p className="mt-4 text-2xl font-black tracking-tight">
+        <span
+          className={`h-2 w-2 shrink-0 rounded-full ${
+            accent
+              ? "bg-accent"
+              : "bg-foreground-muted"
+          }`}
+        />
+      </div>
+
+      <p className="mt-4 text-2xl font-black tracking-tight sm:text-3xl">
         {value}
       </p>
 
@@ -256,9 +282,9 @@ function SummaryCard({
   );
 }
 
-/* -------------------------------- */
+/* ========================================================= */
 /* HELPERS */
-/* -------------------------------- */
+/* ========================================================= */
 
 function getInitials(
   firstName?: string,

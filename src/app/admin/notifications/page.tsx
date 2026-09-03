@@ -39,15 +39,15 @@ export default async function AdminNotificationsPage() {
     <div className="min-h-screen bg-background">
       {/* PAGE HEADER */}
       <section className="border-b border-border">
-        <div className="container-responsive py-8 sm:py-10">
+        <div className="container-responsive py-7 sm:py-9 lg:py-10">
+          
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">
+            <div className="min-w-0">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-accent sm:text-xs">
                 Platform Management
               </p>
 
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+              <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
                 Notifications
               </h1>
 
@@ -57,7 +57,7 @@ export default async function AdminNotificationsPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card px-5 py-4">
+            <div className="w-full rounded-2xl border border-border bg-card px-5 py-4 sm:w-fit">
               <p className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                 Total Notifications
               </p>
@@ -103,8 +103,8 @@ export default async function AdminNotificationsPage() {
       {/* NOTIFICATION ACTIVITY */}
       <section className="container-responsive pb-10">
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          <div className="flex flex-col gap-3 border-b border-border px-4 py-5 sm:px-5 md:flex-row md:items-center md:justify-between">
+            <div className="min-w-0">
               <h2 className="text-base font-bold">
                 System Activity
               </h2>
@@ -114,13 +114,13 @@ export default async function AdminNotificationsPage() {
               </p>
             </div>
 
-            <span className="w-fit rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground-secondary">
+            <span className="w-fit shrink-0 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground-secondary">
               {totalNotifications} notifications
             </span>
           </div>
 
           {notifications.length === 0 ? (
-            <div className="px-6 py-16 text-center">
+            <div className="px-5 py-14 text-center sm:px-6 sm:py-16">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background text-lg text-foreground-muted">
                 ◉
               </div>
@@ -153,45 +153,43 @@ export default async function AdminNotificationsPage() {
                 return (
                   <div
                     key={notification._id.toString()}
-                    className="group px-5 py-5 transition hover:bg-background-secondary/60"
+                    className="group px-4 py-5 transition hover:bg-background-secondary/60 sm:px-5"
                   >
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                       {/* MAIN CONTENT */}
-                      <div className="flex min-w-0 gap-4">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-accent/20 bg-accent/10 text-sm font-black text-accent">
+                      <div className="flex min-w-0 gap-3 sm:gap-4">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-accent/20 bg-accent/10 text-sm font-black text-accent sm:h-11 sm:w-11">
                           ◉
                         </div>
 
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-sm font-bold">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+                            <h3 className="max-w-full break-words text-sm font-bold">
                               {notification.title}
                             </h3>
 
-                            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-foreground-muted">
+                            <span className="w-fit max-w-full rounded-full border border-border bg-background px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-foreground-muted">
                               {formatNotificationType(
                                 notification.type
                               )}
                             </span>
                           </div>
 
-                          <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground-secondary">
+                          <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-foreground-secondary">
                             {notification.message}
                           </p>
 
-                          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-                            <span className="text-xs font-semibold text-foreground">
+                          <div className="mt-3 flex flex-col items-start gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2">
+                            <span className="max-w-full truncate text-xs font-semibold text-foreground">
                               {userName}
                             </span>
 
-                            <span className="text-xs text-foreground-muted">
+                            <span className="max-w-full truncate text-xs text-foreground-muted">
                               {user?.email || "No email"}
                             </span>
 
                             <span className="text-xs text-foreground-muted">
-                              {formatDate(
-                                notification.createdAt
-                              )}
+                              {formatDate(notification.createdAt)}
                             </span>
                           </div>
                         </div>
@@ -232,7 +230,7 @@ function StatCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border p-5 transition ${
+      className={`card-responsive rounded-2xl border p-5 transition ${
         accent
           ? "border-accent/30 bg-accent/10"
           : "border-border bg-card hover:border-border-hover"
@@ -244,7 +242,7 @@ function StatCard({
         </p>
 
         <span
-          className={`h-2 w-2 rounded-full ${
+          className={`h-2 w-2 shrink-0 rounded-full ${
             accent ? "bg-accent" : "bg-foreground-muted"
           }`}
         />
@@ -272,14 +270,14 @@ function ReadStatus({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${
+      className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${
         read
           ? "border-border bg-background text-foreground-muted"
           : "border-accent/30 bg-accent/10 text-accent"
       }`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${
+        className={`h-1.5 w-1.5 shrink-0 rounded-full ${
           read ? "bg-foreground-muted" : "bg-accent"
         }`}
       />

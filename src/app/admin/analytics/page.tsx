@@ -80,9 +80,9 @@ export default function AdminAnalyticsPage() {
   if (error || !analytics) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container-responsive py-16">
-          <div className="rounded-2xl border border-border bg-card p-8 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background text-foreground-muted">
+        <div className="container-responsive py-10 sm:py-16">
+          <div className="mx-auto max-w-lg rounded-2xl border border-border bg-card p-6 text-center sm:p-8">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background text-lg font-black text-foreground-muted">
               !
             </div>
 
@@ -90,13 +90,14 @@ export default function AdminAnalyticsPage() {
               Analytics unavailable
             </h1>
 
-            <p className="mt-2 text-sm text-foreground-muted">
-              {error || "Unable to load platform analytics."}
+            <p className="mt-2 text-sm leading-6 text-foreground-muted">
+              {error ||
+                "Unable to load platform analytics."}
             </p>
 
             <Link
               href="/admin"
-              className="mt-6 inline-flex rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-hover"
+              className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover sm:w-auto"
             >
               Return to Overview
             </Link>
@@ -133,33 +134,38 @@ export default function AdminAnalyticsPage() {
     <div className="min-h-screen bg-background">
       {/* HEADER */}
       <section className="border-b border-border">
-        <div className="container-responsive py-8 sm:py-10">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">
+        <div className="container-responsive py-6 sm:py-8 lg:py-10">
+         
+          <div className="mt-6 flex flex-col gap-6 lg:mt-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="min-w-0">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-accent sm:text-xs">
                 Platform Intelligence
               </p>
 
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+              <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
                 Analytics
               </h1>
 
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground-secondary">
-                Monitor Eventora's users, events, bookings,
-                revenue, and ticket activity from one place.
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-foreground-secondary">
+                Monitor Eventora&apos;s users, events,
+                bookings, revenue, and ticket activity
+                from one place.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-accent/20 bg-accent/10 px-5 py-4">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-accent">
+            <div className="w-full rounded-2xl border border-accent/20 bg-accent/10 p-4 sm:p-5 lg:w-auto lg:min-w-[240px]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-accent">
                 Confirmed Revenue
               </p>
 
-              <p className="mt-1 text-2xl font-black">
+              <p className="mt-2 truncate text-2xl font-black tracking-tight sm:text-3xl">
                 {formatAmount(
                   analytics.revenue.confirmedBookingRevenue
                 )}
+              </p>
+
+              <p className="mt-1 text-xs text-foreground-muted">
+                From confirmed bookings
               </p>
             </div>
           </div>
@@ -167,7 +173,7 @@ export default function AdminAnalyticsPage() {
       </section>
 
       {/* PRIMARY METRICS */}
-      <section className="container-responsive py-6">
+      <section className="container-responsive py-5 sm:py-6">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <MetricCard
             label="Total Users"
@@ -200,8 +206,8 @@ export default function AdminAnalyticsPage() {
       </section>
 
       {/* MAIN ANALYTICS */}
-      <section className="container-responsive pb-6">
-        <div className="grid gap-6 xl:grid-cols-3">
+      <section className="container-responsive pb-5 sm:pb-6">
+        <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
           {/* USERS */}
           <AnalyticsCard
             title="User Composition"
@@ -218,6 +224,7 @@ export default function AdminAnalyticsPage() {
                 label="Organizers"
                 value={analytics.users.organizers}
                 total={analytics.users.total}
+                accent
               />
 
               <ProgressRow
@@ -285,19 +292,19 @@ export default function AdminAnalyticsPage() {
       </section>
 
       {/* PERFORMANCE SUMMARY */}
-      <section className="container-responsive pb-10">
+      <section className="container-responsive pb-8 sm:pb-10">
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="border-b border-border px-5 py-5">
+          <div className="border-b border-border px-4 py-5 sm:px-5">
             <h2 className="text-base font-bold">
               Platform Performance
             </h2>
 
-            <p className="mt-1 text-xs text-foreground-muted">
+            <p className="mt-1 text-xs leading-5 text-foreground-muted">
               Key operational indicators across Eventora.
             </p>
           </div>
 
-          <div className="grid divide-y divide-border sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4">
             <PerformanceItem
               label="Booking Conversion"
               value={`${bookingConfirmationRate}%`}
@@ -349,23 +356,23 @@ function MetricCard({
   icon: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 transition hover:border-border-hover">
+    <div className="card-responsive rounded-2xl border border-border bg-card p-4 transition hover:border-border-hover sm:p-5">
       <div className="flex items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-foreground-muted">
             {label}
           </p>
 
-          <p className="mt-4 text-3xl font-black tracking-tight">
+          <p className="mt-3 text-3xl font-black tracking-tight sm:mt-4">
             {value}
           </p>
 
-          <p className="mt-1 text-xs text-foreground-muted">
+          <p className="mt-1 truncate text-xs text-foreground-muted">
             {detail}
           </p>
         </div>
 
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-sm font-bold text-accent">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-sm font-bold text-accent">
           {icon}
         </div>
       </div>
@@ -387,13 +394,13 @@ function AnalyticsCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
+    <div className="card-responsive rounded-2xl border border-border bg-card p-4 sm:p-5">
       <div className="mb-6">
         <h2 className="text-sm font-bold">
           {title}
         </h2>
 
-        <p className="mt-1 text-xs text-foreground-muted">
+        <p className="mt-1 text-xs leading-5 text-foreground-muted">
           {description}
         </p>
       </div>
@@ -426,11 +433,11 @@ function ProgressRow({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between gap-3">
-        <span className="text-xs font-semibold">
+        <span className="min-w-0 truncate text-xs font-semibold">
           {label}
         </span>
 
-        <span className="text-xs font-bold text-foreground-secondary">
+        <span className="shrink-0 text-xs font-bold text-foreground-secondary">
           {value}
         </span>
       </div>
@@ -438,7 +445,9 @@ function ProgressRow({
       <div className="h-2 overflow-hidden rounded-full bg-background">
         <div
           className={`h-full rounded-full transition-all ${
-            accent ? "bg-accent" : "bg-foreground-muted"
+            accent
+              ? "bg-accent"
+              : "bg-foreground-muted"
           }`}
           style={{
             width: `${percentage}%`,
@@ -467,16 +476,16 @@ function PerformanceItem({
   description: string;
 }) {
   return (
-    <div className="p-5">
+    <div className="border-b border-border p-4 last:border-b-0 sm:border-r sm:p-5 sm:nth-[2n]:border-r-0 xl:border-b-0 xl:border-r xl:nth-[2n]:border-r xl:last:border-r-0">
       <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-foreground-muted">
         {label}
       </p>
 
-      <p className="mt-3 truncate text-xl font-black">
+      <p className="mt-3 truncate text-xl font-black sm:text-2xl">
         {value}
       </p>
 
-      <p className="mt-1 text-xs text-foreground-muted">
+      <p className="mt-1 text-xs leading-5 text-foreground-muted">
         {description}
       </p>
     </div>
@@ -491,14 +500,18 @@ function AnalyticsSkeleton() {
   return (
     <div className="min-h-screen bg-background">
       <section className="border-b border-border">
-        <div className="container-responsive py-10">
+        <div className="container-responsive py-8 sm:py-10">
           <div className="h-3 w-32 animate-pulse rounded bg-card" />
-          <div className="mt-4 h-10 w-56 animate-pulse rounded bg-card" />
+
+          <div className="mt-4 h-10 w-48 animate-pulse rounded bg-card sm:w-56" />
+
           <div className="mt-3 h-4 w-full max-w-xl animate-pulse rounded bg-card" />
+
+          <div className="mt-6 h-24 w-full animate-pulse rounded-2xl bg-card sm:w-64" />
         </div>
       </section>
 
-      <div className="container-responsive py-6">
+      <div className="container-responsive py-5 sm:py-6">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[1, 2, 3, 4].map((item) => (
             <div
@@ -508,7 +521,7 @@ function AnalyticsSkeleton() {
           ))}
         </div>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-3">
+        <div className="mt-5 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
           {[1, 2, 3].map((item) => (
             <div
               key={item}
@@ -516,6 +529,8 @@ function AnalyticsSkeleton() {
             />
           ))}
         </div>
+
+        <div className="mt-5 h-48 animate-pulse rounded-2xl border border-border bg-card" />
       </div>
     </div>
   );

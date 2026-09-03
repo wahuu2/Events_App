@@ -35,15 +35,15 @@ export default async function AdminTicketsPage() {
     <div className="min-h-screen bg-background">
       {/* PAGE HEADER */}
       <section className="border-b border-border">
-        <div className="container-responsive py-8 sm:py-10">
+        <div className="container-responsive py-7 sm:py-9 lg:py-10">
+          
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">
+            <div className="min-w-0">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-accent sm:text-xs">
                 Platform Management
               </p>
 
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+              <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
                 Tickets
               </h1>
 
@@ -53,7 +53,7 @@ export default async function AdminTicketsPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card px-5 py-4">
+            <div className="w-full rounded-2xl border border-border bg-card px-5 py-4 sm:w-fit">
               <p className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                 Total Tickets
               </p>
@@ -99,8 +99,8 @@ export default async function AdminTicketsPage() {
       {/* TICKET ACTIVITY */}
       <section className="container-responsive pb-10">
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          <div className="flex flex-col gap-3 border-b border-border px-4 py-5 sm:px-5 md:flex-row md:items-center md:justify-between">
+            <div className="min-w-0">
               <h2 className="text-base font-bold">
                 Digital Ticket Activity
               </h2>
@@ -110,13 +110,13 @@ export default async function AdminTicketsPage() {
               </p>
             </div>
 
-            <span className="w-fit rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground-secondary">
+            <span className="w-fit shrink-0 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground-secondary">
               {totalTickets} tickets
             </span>
           </div>
 
           {tickets.length === 0 ? (
-            <div className="px-6 py-16 text-center">
+            <div className="px-5 py-14 text-center sm:px-6 sm:py-16">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background text-lg text-foreground-muted">
                 ▤
               </div>
@@ -203,8 +203,8 @@ export default async function AdminTicketsPage() {
                               ▤
                             </div>
 
-                            <div className="min-w-0">
-                              <p className="font-mono text-xs font-bold text-foreground">
+                            <div className="min-w-0 max-w-[190px]">
+                              <p className="truncate font-mono text-xs font-bold text-foreground">
                                 {ticket.ticketNumber}
                               </p>
 
@@ -251,8 +251,8 @@ export default async function AdminTicketsPage() {
 
                         {/* BOOKING */}
                         <td className="px-5 py-5">
-                          <div>
-                            <span className="rounded-lg border border-border bg-background px-2.5 py-1.5 font-mono text-[10px] font-semibold text-foreground-secondary">
+                          <div className="min-w-0">
+                            <span className="inline-block max-w-[180px] truncate rounded-lg border border-border bg-background px-2.5 py-1.5 font-mono text-[10px] font-semibold text-foreground-secondary">
                               {booking?.bookingReference ||
                                 "N/A"}
                             </span>
@@ -274,7 +274,7 @@ export default async function AdminTicketsPage() {
 
                         {/* GENERATED */}
                         <td className="px-5 py-5 text-right">
-                          <span className="text-xs text-foreground-secondary">
+                          <span className="whitespace-nowrap text-xs text-foreground-secondary">
                             {formatDate(ticket.createdAt)}
                           </span>
                         </td>
@@ -308,7 +308,7 @@ function StatCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border p-5 transition ${
+      className={`card-responsive rounded-2xl border p-5 transition ${
         accent
           ? "border-accent/30 bg-accent/10"
           : "border-border bg-card hover:border-border-hover"
@@ -320,7 +320,7 @@ function StatCard({
         </p>
 
         <span
-          className={`h-2 w-2 rounded-full ${
+          className={`h-2 w-2 shrink-0 rounded-full ${
             accent ? "bg-accent" : "bg-foreground-muted"
           }`}
         />
@@ -355,10 +355,10 @@ function TicketStatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${styles}`}
+      className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${styles}`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${
+        className={`h-1.5 w-1.5 shrink-0 rounded-full ${
           status === "valid"
             ? "bg-accent"
             : "bg-foreground-muted"

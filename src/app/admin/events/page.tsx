@@ -17,19 +17,26 @@ export default async function AdminEventsPage() {
 
   const totalEvents = events.length;
 
+  const now = new Date();
+
   const upcomingEvents = events.filter(
-    (event) => new Date(event.date) >= new Date()
+    (event) => new Date(event.date) >= now
   ).length;
 
   const pastEvents = totalEvents - upcomingEvents;
 
   return (
     <div className="min-h-screen bg-background">
+      {/* ===================================================== */}
       {/* PAGE HEADER */}
+      {/* ===================================================== */}
+
       <section className="border-b border-border">
         <div className="container-responsive py-8 sm:py-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
+            {/* Heading */}
+            <div className="min-w-0">
+             
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">
                 Platform Management
               </p>
@@ -39,13 +46,14 @@ export default async function AdminEventsPage() {
               </h1>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground-secondary">
-                Monitor every event published across the Eventora
-                platform and review its organizer, schedule, and
-                location.
+                Monitor every event published across the
+                Eventora platform and review its organizer,
+                schedule, and location.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card px-5 py-4">
+            {/* Total Events */}
+            <div className="w-full rounded-2xl border border-border bg-card px-5 py-4 sm:w-fit">
               <p className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                 Total Events
               </p>
@@ -58,9 +66,12 @@ export default async function AdminEventsPage() {
         </div>
       </section>
 
+      {/* ===================================================== */}
       {/* STAT CARDS */}
+      {/* ===================================================== */}
+
       <section className="container-responsive py-6">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
             label="Total Events"
             value={totalEvents}
@@ -82,11 +93,15 @@ export default async function AdminEventsPage() {
         </div>
       </section>
 
+      {/* ===================================================== */}
       {/* EVENTS TABLE */}
+      {/* ===================================================== */}
+
       <section className="container-responsive pb-10">
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          {/* Table Header */}
+          <div className="flex flex-col gap-3 border-b border-border px-4 py-5 sm:px-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <h2 className="text-base font-bold">
                 Platform Events
               </h2>
@@ -101,8 +116,9 @@ export default async function AdminEventsPage() {
             </span>
           </div>
 
+          {/* Empty State */}
           {events.length === 0 ? (
-            <div className="px-6 py-16 text-center">
+            <div className="px-5 py-16 text-center sm:px-6">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background text-lg text-foreground-muted">
                 ▣
               </div>
@@ -116,6 +132,10 @@ export default async function AdminEventsPage() {
               </p>
             </div>
           ) : (
+            /*
+             * Keep the complete table readable on mobile.
+             * Horizontal scrolling is restricted to this area.
+             */
             <div className="table-wrapper">
               <table className="w-full min-w-[950px]">
                 <thead>
@@ -149,7 +169,7 @@ export default async function AdminEventsPage() {
                 <tbody>
                   {events.map((event) => {
                     const eventDate = new Date(event.date);
-                    const isUpcoming = eventDate >= new Date();
+                    const isUpcoming = eventDate >= now;
 
                     const organizer = event.organizer as
                       | {
@@ -181,7 +201,7 @@ export default async function AdminEventsPage() {
                                 {event.title}
                               </p>
 
-                              <p className="mt-1 truncate text-[10px] text-foreground-muted">
+                              <p className="mt-1 text-[10px] text-foreground-muted">
                                 Event listing
                               </p>
                             </div>
@@ -205,11 +225,11 @@ export default async function AdminEventsPage() {
                         {/* DATE */}
                         <td className="px-5 py-5">
                           <div>
-                            <p className="text-sm font-semibold">
+                            <p className="whitespace-nowrap text-sm font-semibold">
                               {formatDate(event.date)}
                             </p>
 
-                            <p className="mt-1 text-[10px] text-foreground-muted">
+                            <p className="mt-1 whitespace-nowrap text-[10px] text-foreground-muted">
                               {formatTime(event.date)}
                             </p>
                           </div>
@@ -218,11 +238,11 @@ export default async function AdminEventsPage() {
                         {/* LOCATION */}
                         <td className="px-5 py-5">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-accent">
+                            <span className="shrink-0 text-xs text-accent">
                               +
                             </span>
 
-                            <span className="max-w-[180px] truncate text-sm text-foreground-secondary">
+                            <span className="block max-w-[180px] truncate text-sm text-foreground-secondary">
                               {event.location ||
                                 "Location not specified"}
                             </span>
@@ -232,27 +252,29 @@ export default async function AdminEventsPage() {
                         {/* STATUS */}
                         <td className="px-5 py-5">
                           <span
-                            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${
+                            className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${
                               isUpcoming
                                 ? "border-accent/30 bg-accent/10 text-accent"
                                 : "border-border bg-background-secondary text-foreground-muted"
                             }`}
                           >
                             <span
-                              className={`h-1.5 w-1.5 rounded-full ${
+                              className={`h-1.5 w-1.5 shrink-0 rounded-full ${
                                 isUpcoming
                                   ? "bg-accent"
                                   : "bg-foreground-muted"
                               }`}
                             />
 
-                            {isUpcoming ? "Upcoming" : "Past"}
+                            {isUpcoming
+                              ? "Upcoming"
+                              : "Past"}
                           </span>
                         </td>
 
                         {/* ID */}
                         <td className="px-5 py-5 text-right">
-                          <span className="font-mono text-[10px] text-foreground-muted">
+                          <span className="whitespace-nowrap font-mono text-[10px] text-foreground-muted">
                             {event._id
                               .toString()
                               .slice(-8)}
@@ -271,9 +293,9 @@ export default async function AdminEventsPage() {
   );
 }
 
-/* -------------------------------- */
+/* ========================================================= */
 /* STAT CARD */
-/* -------------------------------- */
+/* ========================================================= */
 
 function StatCard({
   label,
@@ -300,8 +322,10 @@ function StatCard({
         </p>
 
         <span
-          className={`h-2 w-2 rounded-full ${
-            accent ? "bg-accent" : "bg-foreground-muted"
+          className={`h-2 w-2 shrink-0 rounded-full ${
+            accent
+              ? "bg-accent"
+              : "bg-foreground-muted"
           }`}
         />
       </div>
@@ -317,9 +341,9 @@ function StatCard({
   );
 }
 
-/* -------------------------------- */
+/* ========================================================= */
 /* HELPERS */
-/* -------------------------------- */
+/* ========================================================= */
 
 function formatDate(date: Date | string) {
   return new Date(date).toLocaleDateString("en-GB", {

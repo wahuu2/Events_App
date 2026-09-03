@@ -44,15 +44,15 @@ export default async function AdminPaymentsPage() {
     <div className="min-h-screen bg-background">
       {/* PAGE HEADER */}
       <section className="border-b border-border">
-        <div className="container-responsive py-8 sm:py-10">
+        <div className="container-responsive py-7 sm:py-9 lg:py-10">
+          
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">
+            <div className="min-w-0">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-accent sm:text-xs">
                 Platform Management
               </p>
 
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+              <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
                 Payments
               </h1>
 
@@ -62,7 +62,7 @@ export default async function AdminPaymentsPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card px-5 py-4">
+            <div className="w-full rounded-2xl border border-border bg-card px-5 py-4 sm:w-fit">
               <p className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                 Total Payments
               </p>
@@ -107,26 +107,26 @@ export default async function AdminPaymentsPage() {
 
       {/* REVENUE */}
       <section className="container-responsive pb-6">
-        <div className="relative overflow-hidden rounded-2xl border border-accent/20 bg-accent/10 p-6">
+        <div className="relative overflow-hidden rounded-2xl border border-accent/20 bg-accent/10 p-5 sm:p-6">
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full border border-accent/10 bg-accent/5" />
 
-          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
                 Successful Revenue
               </p>
 
-              <p className="mt-2 text-3xl font-black tracking-tight">
+              <p className="mt-2 break-words text-2xl font-black tracking-tight sm:text-3xl">
                 {formatAmount(successfulRevenue)}
               </p>
 
-              <p className="mt-1 text-xs text-foreground-secondary">
+              <p className="mt-1 max-w-xl text-xs leading-5 text-foreground-secondary">
                 Total value of successfully completed payments.
               </p>
             </div>
 
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-accent/20 bg-background text-lg font-black text-accent">
-              K
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-accent/20 bg-background text-sm font-black text-accent">
+              KES
             </div>
           </div>
         </div>
@@ -135,8 +135,8 @@ export default async function AdminPaymentsPage() {
       {/* PAYMENTS TABLE */}
       <section className="container-responsive pb-10">
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          <div className="flex flex-col gap-3 border-b border-border px-4 py-5 sm:px-5 md:flex-row md:items-center md:justify-between">
+            <div className="min-w-0">
               <h2 className="text-base font-bold">
                 Payment Activity
               </h2>
@@ -146,13 +146,13 @@ export default async function AdminPaymentsPage() {
               </p>
             </div>
 
-            <span className="w-fit rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground-secondary">
+            <span className="w-fit shrink-0 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground-secondary">
               {totalPayments} payments
             </span>
           </div>
 
           {payments.length === 0 ? (
-            <div className="px-6 py-16 text-center">
+            <div className="px-5 py-14 text-center sm:px-6 sm:py-16">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background text-lg text-foreground-muted">
                 ◫
               </div>
@@ -254,8 +254,8 @@ export default async function AdminPaymentsPage() {
 
                         {/* BOOKING */}
                         <td className="px-5 py-5">
-                          <div>
-                            <span className="rounded-lg border border-border bg-background px-2.5 py-1.5 font-mono text-[10px] font-semibold text-foreground-secondary">
+                          <div className="min-w-0">
+                            <span className="inline-block max-w-[180px] truncate rounded-lg border border-border bg-background px-2.5 py-1.5 font-mono text-[10px] font-semibold text-foreground-secondary">
                               {booking?.bookingReference ||
                                 "N/A"}
                             </span>
@@ -270,7 +270,7 @@ export default async function AdminPaymentsPage() {
 
                         {/* AMOUNT */}
                         <td className="px-5 py-5">
-                          <span className="text-sm font-black">
+                          <span className="whitespace-nowrap text-sm font-black">
                             {formatAmount(
                               Number(payment.amount) || 0
                             )}
@@ -279,8 +279,8 @@ export default async function AdminPaymentsPage() {
 
                         {/* METHOD */}
                         <td className="px-5 py-5">
-                          <span className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-foreground-secondary">
-                            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                          <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-border bg-background px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-foreground-secondary">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
 
                             {payment.method}
                           </span>
@@ -295,7 +295,7 @@ export default async function AdminPaymentsPage() {
 
                         {/* TRANSACTION */}
                         <td className="px-5 py-5">
-                          <span className="font-mono text-[10px] text-foreground-muted">
+                          <span className="block max-w-[180px] truncate font-mono text-[10px] text-foreground-muted">
                             {payment.transactionReference ||
                               "Not assigned"}
                           </span>
@@ -303,7 +303,7 @@ export default async function AdminPaymentsPage() {
 
                         {/* DATE */}
                         <td className="px-5 py-5 text-right">
-                          <span className="text-xs text-foreground-secondary">
+                          <span className="whitespace-nowrap text-xs text-foreground-secondary">
                             {formatDate(payment.createdAt)}
                           </span>
                         </td>
@@ -337,7 +337,7 @@ function StatCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border p-5 transition ${
+      className={`card-responsive rounded-2xl border p-5 transition ${
         accent
           ? "border-accent/30 bg-accent/10"
           : "border-border bg-card hover:border-border-hover"
@@ -349,7 +349,7 @@ function StatCard({
         </p>
 
         <span
-          className={`h-2 w-2 rounded-full ${
+          className={`h-2 w-2 shrink-0 rounded-full ${
             accent ? "bg-accent" : "bg-foreground-muted"
           }`}
         />
@@ -386,10 +386,10 @@ function PaymentStatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${styles}`}
+      className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${styles}`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${
+        className={`h-1.5 w-1.5 shrink-0 rounded-full ${
           status === "successful"
             ? "bg-accent"
             : "bg-foreground-muted"

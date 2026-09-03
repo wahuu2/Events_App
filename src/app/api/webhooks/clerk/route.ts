@@ -1,11 +1,11 @@
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { connectToDatabase } from "@/database";
 import User from "@/database/user.model";
 import { createNotification } from "@/lib/notifications";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const event = await verifyWebhook(request);
 
@@ -23,7 +23,8 @@ export async function POST(request: Request) {
       } = event.data;
 
       const primaryEmail = email_addresses.find(
-        (email) => email.id === primary_email_address_id
+        (email) =>
+          email.id === primary_email_address_id
       );
 
       // Check whether this user already exists
@@ -48,7 +49,10 @@ export async function POST(request: Request) {
         }
       );
 
-      console.log("User created in MongoDB:", id);
+      console.log(
+        "User created in MongoDB:",
+        id
+      );
 
       // Create welcome notification only for a genuinely new user
       if (!existingUser && user) {
@@ -60,7 +64,10 @@ export async function POST(request: Request) {
             "Your EventApp account has been created successfully.",
         });
 
-        console.log("Registration notification created:", id);
+        console.log(
+          "Registration notification created:",
+          id
+        );
       }
     }
 
@@ -76,7 +83,8 @@ export async function POST(request: Request) {
       } = event.data;
 
       const primaryEmail = email_addresses.find(
-        (email) => email.id === primary_email_address_id
+        (email) =>
+          email.id === primary_email_address_id
       );
 
       await User.findOneAndUpdate(
@@ -92,7 +100,10 @@ export async function POST(request: Request) {
         }
       );
 
-      console.log("User updated in MongoDB:", id);
+      console.log(
+        "User updated in MongoDB:",
+        id
+      );
     }
 
     // USER DELETED
@@ -101,14 +112,20 @@ export async function POST(request: Request) {
         clerkId: event.data.id,
       });
 
-      console.log("User deleted from MongoDB:", event.data.id);
+      console.log(
+        "User deleted from MongoDB:",
+        event.data.id
+      );
     }
 
     return NextResponse.json({
       success: true,
     });
   } catch (error) {
-    console.error("Webhook verification/database error:", error);
+    console.error(
+      "Webhook verification/database error:",
+      error
+    );
 
     return NextResponse.json(
       {
