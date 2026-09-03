@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
@@ -20,7 +20,10 @@ export const metadata: Metadata = {
     "organizer tools",
   ],
   authors: [{ name: "Eventora Team" }],
-  themeColor: "#0A66C2", // LinkedIn-style bold blue
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0A66C2",
 };
 
 export default function RootLayout({
