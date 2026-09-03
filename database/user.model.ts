@@ -9,14 +9,14 @@ const userSchema = new Schema(
     },
 
     firstName: {
-  type: String,
-  required: true,
-},
+      type: String,
+      required: true,
+    },
 
-lastName: {
-  type: String,
-  required: true,
-},
+    lastName: {
+      type: String,
+      required: true,
+    },
 
     email: {
       type: String,
@@ -30,25 +30,26 @@ lastName: {
 
     role: {
       type: String,
-      enum: ["user", "organizer"],
+      enum: ["user", "organizer", "admin"],
       default: "user",
     },
-     notificationPreferences: {
-    type: [String],
-    enum: [
-      "booking_confirmed",
-      "payment_successful",
-      "ticket_generated",
-      "event_updated",
-      "event_cancelled",
-      "event_reminder",
-      "success",
-      "warning",
-      "info",
-      "error",
-    ],
-    default: ["success", "warning", "info", "error"], // default to all
-  },
+
+    notificationPreferences: {
+      type: [String],
+      enum: [
+        "booking_confirmed",
+        "payment_successful",
+        "ticket_generated",
+        "event_updated",
+        "event_cancelled",
+        "event_reminder",
+        "success",
+        "warning",
+        "info",
+        "error",
+      ],
+      default: ["success", "warning", "info", "error"],
+    },
   },
   {
     timestamps: true,
