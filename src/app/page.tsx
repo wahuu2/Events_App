@@ -54,18 +54,30 @@ export default async function HomePage() {
   const user = await getCurrentUser();
 
   /*
-   * Role-based routing
+   * =========================================
+   * ROLE-BASED ROUTING
+   * =========================================
    *
-   * Admins go directly to the admin system.
-   * Organizers go directly to their organizer workspace.
-   * Normal users remain on the public Eventora homepage.
+   * Admin      → Admin system
+   * Organizer  → Organizer workspace
+   * User       → User dashboard
+   * Guest      → Public Eventora homepage
    */
-  if (user?.role === "admin") {
-    redirect("/admin");
-  }
 
-  if (user?.role === "organizer") {
-    redirect("/dashboard/organizer");
+  if (user) {
+    switch (user.role) {
+      case "admin":
+        redirect("/admin");
+
+      case "organizer":
+        redirect("/dashboard/organizer");
+
+      case "user":
+        redirect("/dashboard");
+
+      default:
+        break;
+    }
   }
 
   return (
@@ -201,9 +213,7 @@ export default async function HomePage() {
                   key={number}
                   className="rounded-xl border border-border bg-background p-4"
                 >
-                  <p className="text-xl font-bold sm:text-2xl">
-                    {number}
-                  </p>
+                  <p className="text-xl font-bold sm:text-2xl">{number}</p>
 
                   <p className="mt-1 text-xs text-foreground-muted">
                     {label}
@@ -291,9 +301,7 @@ export default async function HomePage() {
                   </div>
 
                   <div className="rounded-xl border border-border bg-background p-5">
-                    <p className="text-xs text-foreground-muted">
-                      BOOKINGS
-                    </p>
+                    <p className="text-xs text-foreground-muted">BOOKINGS</p>
 
                     <p className="mt-2 text-lg font-semibold">
                       Monitor attendees
@@ -359,7 +367,7 @@ export default async function HomePage() {
 
               <Link
                 href="/events"
-                className="inline-flex w-full shrink-0 items-center justify-center rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition-all duration-200 hover:bg-accent-hover sm:w-auto sm:px-7"
+                className="inline-flex w-full shrink-0 items-center justify-center rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition-all duration-200 hover:bg-accent-hover hover:shadow-blue-500/20 sm:w-auto sm:px-7"
               >
                 Browse Events
                 <span className="ml-2">→</span>
