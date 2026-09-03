@@ -3,7 +3,10 @@
 :root {
   --background: #09090b;
   --background-secondary: #111113;
+  --background-tertiary: #18181b;
+
   --card: #18181b;
+  --card-hover: #1f1f23;
 
   --border: #27272a;
   --border-hover: #3f3f46;
@@ -14,12 +17,20 @@
 
   --accent: #3b82f6;
   --accent-hover: #2563eb;
+  --accent-soft: rgba(59, 130, 246, 0.12);
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-background-secondary: var(--background-secondary);
+  --color-background-tertiary: var(--background-tertiary);
+
   --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
 
   --color-border: var(--border);
   --color-border-hover: var(--border-hover);
@@ -30,9 +41,14 @@
 
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "Courier New", monospace;
 }
 
 /* -------------------------------- */
@@ -46,6 +62,7 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  background: var(--background);
 }
 
 body {
@@ -55,6 +72,8 @@ body {
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
@@ -63,7 +82,32 @@ body {
 }
 
 /* -------------------------------- */
-/* Responsive Media                 */
+/* Typography                       */
+/* -------------------------------- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--foreground);
+  overflow-wrap: break-word;
+}
+
+p {
+  color: inherit;
+  overflow-wrap: break-word;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: break-word;
+}
+
+/* -------------------------------- */
+/* Media                            */
 /* -------------------------------- */
 
 img,
@@ -94,39 +138,29 @@ button {
   cursor: pointer;
 }
 
-/* Prevent long text from breaking layouts */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p {
-  overflow-wrap: break-word;
+input,
+textarea,
+select {
+  outline: none;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-  overflow-wrap: break-word;
+input::placeholder,
+textarea::placeholder {
+  color: var(--foreground-muted);
 }
 
-/* -------------------------------- */
-/* Tables                           */
-/* -------------------------------- */
-
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-table {
-  max-width: 100%;
+/* Better keyboard accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* -------------------------------- */
-/* Mobile Container                 */
+/* Responsive Container             */
 /* -------------------------------- */
 
 .container-responsive {
@@ -149,7 +183,7 @@ table {
 }
 
 /* -------------------------------- */
-/* Responsive Text                  */
+/* Responsive Typography            */
 /* -------------------------------- */
 
 .text-responsive-xl {
@@ -172,7 +206,7 @@ table {
 }
 
 /* -------------------------------- */
-/* Mobile Buttons                   */
+/* Responsive Buttons               */
 /* -------------------------------- */
 
 .button-responsive {
@@ -195,12 +229,52 @@ table {
 }
 
 /* -------------------------------- */
-/* Prevent Flex/Grid Overflow       */
+/* Flex / Grid Overflow Protection  */
 /* -------------------------------- */
 
 .flex > *,
 .grid > * {
   min-width: 0;
+}
+
+/* -------------------------------- */
+/* Tables                           */
+/* -------------------------------- */
+
+.table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.table-wrapper table {
+  width: max-content;
+  max-width: none;
+}
+
+/* -------------------------------- */
+/* Utility: Text Truncation         */
+/* -------------------------------- */
+
+.text-truncate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* -------------------------------- */
+/* Utility: Line Clamp              */
+/* -------------------------------- */
+
+.line-clamp-2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 /* -------------------------------- */
@@ -238,6 +312,29 @@ table {
 
   button {
     max-width: 100%;
+  }
+
+  .table-wrapper {
+    margin-inline: 0;
+    width: 100%;
+  }
+}
+
+/* -------------------------------- */
+/* Reduced Motion                   */
+/* -------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

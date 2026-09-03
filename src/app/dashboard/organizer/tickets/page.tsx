@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 
 type TicketResult = {
   id: string;
@@ -85,236 +86,423 @@ export default function OrganizerTicketsPage() {
     });
   }
 
+  function getAttendeeName() {
+    const name =
+      `${ticket?.user?.firstName || ""} ${
+        ticket?.user?.lastName || ""
+      }`.trim();
+
+    return name || "Unknown attendee";
+  }
+
+  function getTicketStatusClasses(status: string) {
+    switch (status) {
+      case "valid":
+        return "border-emerald-900/60 bg-emerald-950/30 text-emerald-400";
+
+      case "used":
+        return "border-amber-900/60 bg-amber-950/30 text-amber-400";
+
+      case "cancelled":
+        return "border-red-900/60 bg-red-950/30 text-red-400";
+
+      default:
+        return "border-border bg-background-secondary text-foreground-secondary";
+    }
+  }
+
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
-      {/* Navigation */}
-      <nav className="border-b border-gray-800 px-6 py-5">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">
-              EventApp
-            </h1>
-
-            <p className="text-sm text-gray-400">
-              Organizer Dashboard
-            </p>
-          </div>
-
-          <a
-            href="/dashboard"
-            className="rounded-lg border border-gray-700 px-4 py-2 text-sm hover:bg-gray-800"
-          >
-            Dashboard
-          </a>
-        </div>
-      </nav>
-
-      {/* Main */}
-      <section className="mx-auto max-w-3xl px-6 py-12">
+    <main className="w-full bg-background text-foreground">
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-14">
         {/* Header */}
-        <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-gray-400">
-            Event Check-In
-          </p>
+        <section>
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="relative p-6 sm:p-8 lg:p-10">
+              <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
 
-          <h2 className="mt-3 text-3xl font-bold md:text-4xl">
-            Verify Ticket
-          </h2>
+              <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" />
 
-          <p className="mx-auto mt-3 max-w-xl text-gray-400">
-            Enter the attendee's ticket number to verify their
-            ticket and allow entry to the event.
-          </p>
-        </div>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent sm:text-xs">
+                      Organizer Workspace
+                    </span>
+                  </div>
 
-        {/* Verification Form */}
-        <div className="mt-10 rounded-2xl border border-gray-800 bg-gray-900 p-6 md:p-8">
-          <form onSubmit={verifyTicket}>
-            <label
-              htmlFor="ticketNumber"
-              className="block text-sm font-medium text-gray-300"
-            >
-              Ticket Number
-            </label>
+                  <h1 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                    Ticket Check-In
+                  </h1>
 
-            <input
-              id="ticketNumber"
-              type="text"
-              value={ticketNumber}
-              onChange={(event) =>
-                setTicketNumber(event.target.value)
-              }
-              placeholder="TKT-MTCDI9C8-SW4DI6"
-              className="mt-3 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-3 font-mono text-white outline-none placeholder:text-gray-600 focus:border-white"
-              disabled={loading}
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-4 w-full rounded-lg bg-white px-6 py-3 font-semibold text-black transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? "Verifying..." : "Verify Ticket"}
-            </button>
-          </form>
-        </div>
-
-        {/* Result */}
-        {message && (
-          <div
-            className={`mt-8 overflow-hidden rounded-2xl border ${
-              success
-                ? "border-green-800 bg-green-950/40"
-                : "border-red-800 bg-red-950/40"
-            }`}
-          >
-            {/* Result Header */}
-            <div
-              className={`border-b p-6 ${
-                success
-                  ? "border-green-800"
-                  : "border-red-800"
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${
-                    success
-                      ? "bg-green-500/20 text-green-400"
-                      : "bg-red-500/20 text-red-400"
-                  }`}
-                >
-                  {success ? "✓" : "✕"}
-                </div>
-
-                <div>
-                  <h3 className="text-xl font-bold">
-                    {success
-                      ? "Valid Ticket"
-                      : "Ticket Verification Failed"}
-                  </h3>
-
-                  <p
-                    className={`mt-1 text-sm ${
-                      success
-                        ? "text-green-300"
-                        : "text-red-300"
-                    }`}
-                  >
-                    {message}
+                  <p className="mt-4 max-w-2xl text-sm leading-7 text-foreground-secondary sm:text-base">
+                    Verify attendee tickets quickly and securely before
+                    allowing entry to your event.
                   </p>
                 </div>
+
+                <Link
+                  href="/dashboard/organizer"
+                  className="inline-flex w-full shrink-0 items-center justify-center rounded-xl border border-border-hover px-5 py-3 text-sm font-semibold transition-all duration-200 hover:border-accent/50 hover:bg-background-secondary sm:w-auto"
+                >
+                  ← Organizer Dashboard
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Verification Area */}
+        <section className="mt-8 sm:mt-10">
+          <div className="rounded-2xl border border-border bg-card p-5 sm:p-7 lg:p-8">
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-lg font-bold text-accent">
+                ✓
+              </div>
+
+              <div className="min-w-0">
+                <h2 className="text-xl font-semibold tracking-tight">
+                  Verify a ticket
+                </h2>
+
+                <p className="mt-1 text-sm leading-6 text-foreground-secondary">
+                  Enter the ticket number from the attendee&apos;s digital
+                  ticket to check its validity.
+                </p>
               </div>
             </div>
 
-            {/* Ticket Information */}
-            {ticket && (
-              <div className="p-6">
-                <h4 className="text-lg font-semibold">
-                  Ticket Information
-                </h4>
+            <form
+              onSubmit={verifyTicket}
+              className="mt-7"
+            >
+              <label
+                htmlFor="ticketNumber"
+                className="block text-sm font-medium text-foreground"
+              >
+                Ticket Number
+              </label>
 
-                <div className="mt-5 space-y-5">
-                  {/* Ticket Number */}
-                  <div>
-                    <p className="text-sm text-gray-400">
-                      Ticket Number
-                    </p>
+              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+                <input
+                  id="ticketNumber"
+                  type="text"
+                  value={ticketNumber}
+                  onChange={(event) =>
+                    setTicketNumber(event.target.value)
+                  }
+                  placeholder="TKT-MTCDI9C8-SW4DI6"
+                  autoComplete="off"
+                  spellCheck={false}
+                  disabled={loading}
+                  className="min-w-0 flex-1 rounded-xl border border-border bg-background px-4 py-3.5 font-mono text-sm text-foreground placeholder:text-foreground-muted transition focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:cursor-not-allowed disabled:opacity-60"
+                />
 
-                    <p className="mt-1 break-all font-mono text-lg font-bold">
-                      {ticket.ticketNumber}
-                    </p>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="inline-flex w-full shrink-0 items-center justify-center rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition-all duration-200 hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                >
+                  {loading ? (
+                    <>
+                      <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      Verify Ticket
+                      <span className="ml-2">→</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <p className="mt-3 text-xs leading-5 text-foreground-muted">
+                Ticket numbers are case-sensitive identifiers generated by
+                Eventora.
+              </p>
+            </form>
+          </div>
+        </section>
+
+        {/* Result */}
+        {message && (
+          <section className="mt-6 sm:mt-8">
+            <div
+              role={success ? "status" : "alert"}
+              className={`overflow-hidden rounded-2xl border ${
+                success
+                  ? "border-emerald-900/60 bg-emerald-950/20"
+                  : "border-red-900/60 bg-red-950/20"
+              }`}
+            >
+              {/* Result Header */}
+              <div
+                className={`border-b p-5 sm:p-6 ${
+                  success
+                    ? "border-emerald-900/60"
+                    : "border-red-900/60"
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl font-bold ${
+                      success
+                        ? "bg-emerald-500/10 text-emerald-400"
+                        : "bg-red-500/10 text-red-400"
+                    }`}
+                  >
+                    {success ? "✓" : "×"}
                   </div>
 
-                  {/* Status */}
-                  <div>
-                    <p className="text-sm text-gray-400">
-                      Status
+                  <div className="min-w-0">
+                    <p
+                      className={`text-[10px] font-bold uppercase tracking-[0.18em] ${
+                        success
+                          ? "text-emerald-400"
+                          : "text-red-400"
+                      }`}
+                    >
+                      {success ? "Verification Successful" : "Verification Failed"}
                     </p>
 
-                    <span
-                      className={`mt-2 inline-block rounded-full px-3 py-1 text-sm font-semibold capitalize ${
-                        ticket.status === "used"
-                          ? "bg-yellow-500/20 text-yellow-300"
-                          : ticket.status === "valid"
-                            ? "bg-green-500/20 text-green-300"
-                            : "bg-red-500/20 text-red-300"
+                    <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
+                      {success
+                        ? "Valid Ticket"
+                        : "Ticket Verification Failed"}
+                    </h2>
+
+                    <p
+                      className={`mt-2 text-sm leading-6 ${
+                        success
+                          ? "text-emerald-300/90"
+                          : "text-red-300/90"
                       }`}
+                    >
+                      {message}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ticket Information */}
+              {ticket && (
+                <div className="p-5 sm:p-6 lg:p-8">
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                        Ticket Information
+                      </p>
+
+                      <h3 className="mt-1 text-xl font-semibold">
+                        Attendee Entry Pass
+                      </h3>
+                    </div>
+
+                    <span
+                      className={`inline-flex w-fit rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${getTicketStatusClasses(
+                        ticket.status
+                      )}`}
                     >
                       {ticket.status}
                     </span>
                   </div>
 
-                  {/* Attendee */}
-                  {ticket.user && (
-                    <div>
-                      <p className="text-sm text-gray-400">
+                  {/* Ticket Number */}
+                  <div className="mt-6 rounded-2xl border border-border bg-background-secondary p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                      Ticket Number
+                    </p>
+
+                    <p className="mt-3 break-all font-mono text-lg font-bold tracking-tight sm:text-xl">
+                      {ticket.ticketNumber}
+                    </p>
+                  </div>
+
+                  {/* Details Grid */}
+                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                    {/* Attendee */}
+                    <div className="rounded-2xl border border-border bg-card p-5">
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
                         Attendee
                       </p>
 
-                      <p className="mt-1 font-medium">
-                        {ticket.user.firstName}{" "}
-                        {ticket.user.lastName}
+                      <div className="mt-4 flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-sm font-bold text-accent">
+                          {getAttendeeName()
+                            .charAt(0)
+                            .toUpperCase()}
+                        </div>
+
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold">
+                            {getAttendeeName()}
+                          </p>
+
+                          {ticket.user?.email && (
+                            <p className="mt-1 truncate text-xs text-foreground-muted">
+                              {ticket.user.email}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status */}
+                    <div className="rounded-2xl border border-border bg-card p-5">
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                        Ticket Status
                       </p>
 
-                      {ticket.user.email && (
-                        <p className="mt-1 text-sm text-gray-400">
-                          {ticket.user.email}
-                        </p>
-                      )}
+                      <p className="mt-4 text-lg font-semibold capitalize">
+                        {ticket.status}
+                      </p>
+
+                      <p className="mt-1 text-sm text-foreground-muted">
+                        Current ticket verification status
+                      </p>
                     </div>
-                  )}
+                  </div>
 
                   {/* Event */}
                   {ticket.event && (
-                    <div className="border-t border-gray-800 pt-5">
-                      <p className="text-sm text-gray-400">
-                        Event
+                    <div className="mt-5 rounded-2xl border border-border bg-card p-5 sm:p-6">
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground-muted">
+                        Event Details
                       </p>
 
-                      <p className="mt-1 text-lg font-semibold">
-                        {ticket.event.title}
+                      <h3 className="mt-3 text-xl font-bold tracking-tight">
+                        {ticket.event.title || "Unknown event"}
+                      </h3>
+
+                      <div className="mt-5 grid gap-4 sm:grid-cols-3">
+                        <div>
+                          <p className="text-xs text-foreground-muted">
+                            Location
+                          </p>
+
+                          <p className="mt-1 text-sm font-medium">
+                            {ticket.event.location || "N/A"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-foreground-muted">
+                            Date
+                          </p>
+
+                          <p className="mt-1 text-sm font-medium">
+                            {formatDate(ticket.event.date)}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-foreground-muted">
+                            Time
+                          </p>
+
+                          <p className="mt-1 text-sm font-medium">
+                            {ticket.event.time || "N/A"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Entry Result */}
+                  {success && (
+                    <div className="mt-6 rounded-2xl border border-emerald-700/60 bg-emerald-500/10 p-6 text-center">
+                      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-2xl font-bold text-emerald-400">
+                        ✓
+                      </div>
+
+                      <p className="mt-4 text-2xl font-bold tracking-tight text-emerald-400 sm:text-3xl">
+                        ENTRY ALLOWED
                       </p>
 
-                      {ticket.event.location && (
-                        <p className="mt-2 text-sm text-gray-400">
-                          {ticket.event.location}
-                        </p>
-                      )}
+                      <p className="mt-2 text-sm leading-6 text-emerald-300/80">
+                        This ticket has been successfully verified and
+                        checked in.
+                      </p>
+                    </div>
+                  )}
 
-                      {ticket.event.date && (
-                        <p className="mt-2 text-sm text-gray-400">
-                          {formatDate(ticket.event.date)}
-                        </p>
-                      )}
+                  {/* Used / Cancelled */}
+                  {!success && ticket.status !== "valid" && (
+                    <div className="mt-6 rounded-2xl border border-red-900/60 bg-red-950/20 p-5">
+                      <p className="font-semibold text-red-400">
+                        Entry not allowed
+                      </p>
 
-                      {ticket.event.time && (
-                        <p className="mt-1 text-sm text-gray-400">
-                          {ticket.event.time}
-                        </p>
-                      )}
+                      <p className="mt-1 text-sm leading-6 text-red-300/80">
+                        This ticket cannot be used for entry in its current
+                        status.
+                      </p>
                     </div>
                   )}
                 </div>
-
-                {/* Entry Result */}
-                {success && (
-                  <div className="mt-6 rounded-xl border border-green-700 bg-green-500/10 p-5 text-center">
-                    <p className="text-2xl font-bold text-green-400">
-                      ENTRY ALLOWED
-                    </p>
-
-                    <p className="mt-2 text-sm text-green-300">
-                      This ticket has been successfully checked
-                      in.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </section>
         )}
-      </section>
+
+        {/* Instructions */}
+        {!message && (
+          <section className="mt-6 sm:mt-8">
+            <div className="rounded-2xl border border-border bg-background-secondary p-6 sm:p-7">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">
+                Check-In Process
+              </p>
+
+              <div className="mt-5 grid gap-5 sm:grid-cols-3">
+                <div>
+                  <span className="text-2xl font-bold text-foreground-muted">
+                    01
+                  </span>
+
+                  <h3 className="mt-2 font-semibold">
+                    Get the ticket number
+                  </h3>
+
+                  <p className="mt-1 text-sm leading-6 text-foreground-secondary">
+                    Ask the attendee to display their Eventora digital
+                    ticket.
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-2xl font-bold text-foreground-muted">
+                    02
+                  </span>
+
+                  <h3 className="mt-2 font-semibold">
+                    Verify the ticket
+                  </h3>
+
+                  <p className="mt-1 text-sm leading-6 text-foreground-secondary">
+                    Enter the ticket number and submit the verification
+                    request.
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-2xl font-bold text-foreground-muted">
+                    03
+                  </span>
+
+                  <h3 className="mt-2 font-semibold">
+                    Allow entry
+                  </h3>
+
+                  <p className="mt-1 text-sm leading-6 text-foreground-secondary">
+                    Only valid tickets should be accepted at the event
+                    entrance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+      </div>
     </main>
   );
 }
