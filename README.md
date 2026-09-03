@@ -84,7 +84,6 @@ The platform supports three main user roles:
 ---
 
 ## 🏗️ System Architecture
-```text
 User
  │
  ▼
@@ -101,14 +100,19 @@ Next.js Frontend
  │                           Mongoose
  │
  └── Rate Limiting ─────────► Upstash Redis
-🔐 Role‑Based Access
+
+
+---
+
+## 🔐 Role‑Based Access
 Role	Main Access
 User	Events, bookings, payments, tickets, notifications
 Organizer	Event management, bookings, tickets, statistics
 Admin	Complete platform management
 
+---
 
-🧾 API Structure
+## 🧾 API Structure
 Events: /api/events, /api/events/[id]
 
 Bookings: /api/bookings, /api/bookings/[id]
@@ -123,6 +127,8 @@ Organizer: /api/organizer/*
 
 Administrator: /api/admin/*
 
+---
+
 🗃️ Database Models
 User
 
@@ -136,7 +142,9 @@ Ticket
 
 Notification
 
-🔔 Notifications
+---
+
+## 🔔 Notifications
 Supports:
 
 Registration confirmation
@@ -155,11 +163,15 @@ Event reminders
 
 User preferences
 
-📱 Responsive Design
+---
+
+## 📱 Responsive Design
 Optimized for mobile, tablet, laptop, and desktop with responsive layouts, accessible navigation, and adaptive components.
 
-🧱 Project Structure
-text
+----
+
+#🧱 Project Structure
+
 Eventora/
 ├── src/
 │   ├── app/
@@ -170,64 +182,67 @@ Eventora/
 ├── public/
 ├── .env.local
 └── README.md
-🧪 Testing
+
+---
+
+## 🧪 Testing
 Flows tested: authentication, event creation, booking, payment, ticket generation, notifications, organizer/admin authorization, API validation, rate limiting, responsive layouts, and deployment.
 
-🎓 What I Learned
+---
+
+## 🎓 What I Learned
 Hands‑on experience with:
 
-Next.js App Router
+- Next.js App Router
 
-TypeScript & React
+- TypeScript & React
 
-Tailwind CSS
+- Tailwind CSS
 
-MongoDB & Mongoose
+- MongoDB & Mongoose
 
-Clerk authentication
+- Clerk authentication
 
-Role‑based authorization
+- Role‑based authorization
 
-REST API development
+- REST API development
 
-Payment workflow design
+- Payment workflow design
 
-Digital ticket systems
+- Digital ticket systems
 
-Notification systems
+- Notification systems
 
-API security & rate limiting
+- API security & rate limiting
 
-Responsive UI/UX
+- Responsive UI/UX
 
-Git, GitHub, and Vercel deployment
+- Git, GitHub, and Vercel deployment
 
-🚀 Future Improvements
-Real M‑Pesa & card payment integration
+---
 
-Email notifications
+## 🚀 Future Improvements
+- Real M‑Pesa & card payment integration
 
-QR‑code ticket scanning
+- Email notifications
 
-Event reminders
+- QR‑code ticket scanning
 
-Advanced analytics
+- Event reminders
 
-Organizer verification
+- Advanced analytics
 
-Image upload & cloud storage
+- Organizer verification
 
-Automated testing
+- Image upload & cloud storage
 
-Event reviews & ratings
+- Automated testing
 
-👩‍💻 Developer
-Lily Wahu Ngugi  
-Junior Web Developer | ICT Graduate
+- Event reviews & ratings
 
-GitHub: https://github.com/wahuu2
+---
 
-⚖️ License
+## ⚖️ License
 Created for learning, portfolio development, and demonstration of full‑stack web development skills.
 
 Code
