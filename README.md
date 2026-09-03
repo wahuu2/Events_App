@@ -84,6 +84,7 @@ The platform supports three main user roles:
 ---
 
 ## 🏗️ System Architecture
+
 User
  │
  ▼
