@@ -20,13 +20,7 @@ export default async function AdminEventsPage() {
       <div className="container-responsive py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link
-            href="/admin"
-            className="text-sm text-foreground-secondary transition hover:text-foreground"
-          >
-            ← Back to Admin Dashboard
-          </Link>
-
+          
           <div className="mt-6">
             <p className="text-sm font-medium uppercase tracking-wider text-accent">
               Administration

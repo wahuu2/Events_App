@@ -22,7 +22,7 @@ export default async function AdminLayout({
             <Link href="/admin" className="shrink-0">
               <div className="text-lg font-bold">Eventora</div>
               <div className="text-xs font-medium uppercase tracking-wider text-accent">
-                Admin Panel
+                Administration
               </div>
             </Link>
 
